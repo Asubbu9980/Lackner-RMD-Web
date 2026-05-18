@@ -6,28 +6,20 @@ import WaterfallChart from "../components/WaterfallChart";
 import AdvancedChart from "../components/AdvancedChart";
 import DataTable from "../components/DataTable";
 
-import {
-  Activity,
-  Waves,
-  Table2,
-} from "lucide-react";
+import { Activity, Waves, Table2 } from "lucide-react";
 
 const Calculator = () => {
   // =====================================================
   // DISPLAY STATES
   // =====================================================
 
-  const [showChart, setShowChart] =
-    useState(true);
+  const [showChart, setShowChart] = useState(true);
 
-  const [showTable, setShowTable] =
-    useState(false);
+  const [showTable, setShowTable] = useState(false);
 
-  const [showGrowth, setShowGrowth] =
-    useState(false);
+  const [showGrowth, setShowGrowth] = useState(false);
 
-  const [showTax, setShowTax] =
-    useState(true);
+  const [showTax, setShowTax] = useState(true);
 
   return (
     <div
@@ -145,31 +137,14 @@ const Calculator = () => {
               "
             >
               <InputForm
-                showChart={
-                  showChart
-                }
-                setShowChart={
-                  setShowChart
-                }
-
-                showTable={
-                  showTable
-                }
-                setShowTable={
-                  setShowTable
-                }
-
-                showGrowth={
-                  showGrowth
-                }
-                setShowGrowth={
-                  setShowGrowth
-                }
-
+                showChart={showChart}
+                setShowChart={setShowChart}
+                showTable={showTable}
+                setShowTable={setShowTable}
+                showGrowth={showGrowth}
+                setShowGrowth={setShowGrowth}
                 showTax={showTax}
-                setShowTax={
-                  setShowTax
-                }
+                setShowTax={setShowTax}
               />
             </div>
 
@@ -217,10 +192,7 @@ const Calculator = () => {
                         shadow-[0_0_25px_rgba(0,212,255,0.25)]
                       "
                     >
-                      <Activity
-                        size={18}
-                        className="text-white"
-                      />
+                      <Activity size={18} className="text-white" />
                     </div>
 
                     <div>
@@ -245,9 +217,7 @@ const Calculator = () => {
                           text-[var(--text-secondary)]
                         "
                       >
-                        Interactive 3D
-                        visualization and
-                        financial modeling
+                        Interactive 3D visualization and financial modeling
                       </p>
                     </div>
                   </div>
@@ -291,10 +261,7 @@ const Calculator = () => {
                         shadow-[0_0_25px_rgba(168,85,247,0.25)]
                       "
                     >
-                      <Waves
-                        size={18}
-                        className="text-white"
-                      />
+                      <Waves size={18} className="text-white" />
                     </div>
 
                     <div>
@@ -319,8 +286,7 @@ const Calculator = () => {
                           text-[var(--text-secondary)]
                         "
                       >
-                        Cinematic financial
-                        flow visualization
+                        Cinematic financial flow visualization
                       </p>
                     </div>
                   </div>
@@ -366,10 +332,7 @@ const Calculator = () => {
                     shadow-[0_0_25px_rgba(34,197,94,0.25)]
                   "
                 >
-                  <Table2
-                    size={18}
-                    className="text-white"
-                  />
+                  <Table2 size={18} className="text-white" />
                 </div>
 
                 <div>
