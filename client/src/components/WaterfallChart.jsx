@@ -16,20 +16,15 @@ import { useThemeContext } from "../context/ThemeContext";
 import useRmd from "../hooks/useRmd";
 
 const WaterfallChart = () => {
-  const { mode } =
-    useThemeContext();
+  const { mode } = useThemeContext();
 
-  const { result } =
-    useRmd();
+  const { result } = useRmd();
 
-  const isDark =
-    mode === "dark";
+  const isDark = mode === "dark";
 
-  const [view, setView] =
-    useState("3d");
-    
-const rows =
-  result?.rows || [];
+  const [view, setView] = useState("3d");
+
+  const rows = result?.rows || [];
 
   return (
     <Box
@@ -54,8 +49,7 @@ const rows =
 
         p: 2,
 
-        transition:
-          "all 0.3s ease",
+        transition: "all 0.3s ease",
       }}
     >
       {/* =====================================================
@@ -66,8 +60,7 @@ const rows =
         sx={{
           display: "flex",
 
-          justifyContent:
-            "space-between",
+          justifyContent: "space-between",
 
           alignItems: "center",
 
@@ -94,12 +87,9 @@ const rows =
             sx={{
               fontWeight: 800,
 
-              letterSpacing:
-                "-0.3px",
+              letterSpacing: "-0.3px",
 
-              color: isDark
-                ? "#ffffff"
-                : "#0f172a",
+              color: isDark ? "#ffffff" : "#0f172a",
             }}
           >
             Financial Waterfall
@@ -111,13 +101,10 @@ const rows =
 
               fontSize: 12,
 
-              color: isDark
-                ? "rgba(255,255,255,0.65)"
-                : "#64748b",
+              color: isDark ? "rgba(255,255,255,0.65)" : "#64748b",
             }}
           >
-            Interactive Wealth Flow
-            Visualization
+            Interactive Wealth Flow Visualization
           </Typography>
         </Box>
 
@@ -126,59 +113,43 @@ const rows =
         <ToggleButtonGroup
           value={view}
           exclusive
-          onChange={(_, v) =>
-            v && setView(v)
-          }
+          onChange={(_, v) => v && setView(v)}
           size="small"
           sx={{
-            background: isDark
-              ? "rgba(15,23,42,0.9)"
-              : "#f1f5f9",
+            background: isDark ? "rgba(15,23,42,0.9)" : "#f1f5f9",
 
             borderRadius: "14px",
 
             p: 0.4,
 
-            "& .MuiToggleButton-root":
-              {
-                border: 0,
+            "& .MuiToggleButton-root": {
+              border: 0,
 
-                color: isDark
-                  ? "#94a3b8"
-                  : "#475569",
+              color: isDark ? "#94a3b8" : "#475569",
 
-                px: 2,
+              px: 2,
 
-                py: 0.8,
+              py: 0.8,
 
-                fontWeight: 700,
+              fontWeight: 700,
 
-                textTransform:
-                  "none",
+              textTransform: "none",
 
-                borderRadius:
-                  "10px",
+              borderRadius: "10px",
 
-                "&.Mui-selected":
-                  {
-                    background:
-                      "linear-gradient(135deg, #2563eb, #3b82f6)",
+              "&.Mui-selected": {
+                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
 
-                    color: "#fff",
+                color: "#fff",
 
-                    boxShadow:
-                      "0 4px 14px rgba(37,99,235,0.35)",
-                  },
+                boxShadow: "0 4px 14px rgba(37,99,235,0.35)",
               },
+            },
           }}
         >
-          <ToggleButton value="3d">
-            Projection
-          </ToggleButton>
+          <ToggleButton value="3d">Projection</ToggleButton>
 
-          <ToggleButton value="2d">
-            Waterfall
-          </ToggleButton>
+          <ToggleButton value="2d">Waterfall</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 
@@ -196,9 +167,7 @@ const rows =
             ? "1px solid rgba(255,255,255,0.04)"
             : "1px solid rgba(15,23,42,0.06)",
 
-          background: isDark
-            ? "#020617"
-            : "#ffffff",
+          background: isDark ? "#020617" : "#ffffff",
 
           height: "420px",
         }}
@@ -207,274 +176,212 @@ const rows =
           <CascadeFlow3D mode="WATERFALL" />
         ) : (
           <PlotlyChart
-  data={[
-    {
-      x: rows.map(
-        (r) => r.growth
-      ),
+            data={[
+              {
+                x: rows.map((r) => r.growth),
+
+                y: rows.map((r) => `${r.year}`),
+
+                type: "bar",
+
+                orientation: "h",
+
+                name: "Growth",
+
+                marker: {
+                  color: "#86efac",
+                },
+
+                customdata: rows.map((r) => [
+                  r.beginBalance,
+                  r.rmd,
+                  r.tax,
+                  r.growth,
+                  r.endBalance,
+                ]),
+
+                hovertemplate:
+                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
+                  "Financial Projection" +
+                  "</span><br><br>" +
+                  "<b>Year:</b> %{y}<br>" +
+                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
+                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "<extra></extra>",
+              },
+
+              {
+                x: rows.map((r) => r.beginBalance),
+
+                y: rows.map((r) => `${r.year}`),
+
+                type: "bar",
+
+                orientation: "h",
+
+                name: "Principal",
+
+                marker: {
+                  color: "#65a30d",
+                },
+
+                customdata: rows.map((r) => [
+                  r.beginBalance,
+                  r.rmd,
+                  r.tax,
+                  r.growth,
+                  r.endBalance,
+                ]),
+
+                hovertemplate:
+                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
+                  "Financial Projection" +
+                  "</span><br><br>" +
+                  "<b>Year:</b> %{y}<br>" +
+                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
+                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "<extra></extra>",
+              },
+
+              {
+                x: rows.map((r) => r.rmd),
+
+                y: rows.map((r) => `${r.year}`),
+
+                type: "bar",
+
+                orientation: "h",
+
+                name: "RMD",
+
+                marker: {
+                  color: "#9333ea",
+                },
+
+                customdata: rows.map((r) => [
+                  r.beginBalance,
+                  r.rmd,
+                  r.tax,
+                  r.growth,
+                  r.endBalance,
+                ]),
+
+                hovertemplate:
+                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
+                  "Financial Projection" +
+                  "</span><br><br>" +
+                  "<b>Year:</b> %{y}<br>" +
+                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
+                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "<extra></extra>",
+              },
 
-      y: rows.map(
-        (r) => `${r.year}`
-      ),
+              {
+                x: rows.map((r) => r.tax),
 
-      type: "bar",
+                y: rows.map((r) => `${r.year}`),
 
-      orientation: "h",
+                type: "bar",
 
-      name: "Growth",
+                orientation: "h",
 
-      marker: {
-        color: "#86efac",
-      },
+                name: "Tax",
 
-      customdata: rows.map(
-        (r) => [
-          r.beginBalance,
-          r.rmd,
-          r.tax,
-          r.growth,
-          r.endBalance,
-        ]
-      ),
+                marker: {
+                  color: "#ef4444",
+                },
 
-      hovertemplate:
-        "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
-        "Financial Projection" +
-        "</span><br><br>" +
+                customdata: rows.map((r) => [
+                  r.beginBalance,
+                  r.rmd,
+                  r.tax,
+                  r.growth,
+                  r.endBalance,
+                ]),
 
-        "<b>Year:</b> %{y}<br>" +
+                hovertemplate:
+                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
+                  "Financial Projection" +
+                  "</span><br><br>" +
+                  "<b>Year:</b> %{y}<br>" +
+                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
+                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "<extra></extra>",
+              },
+            ]}
+            layout={{
+              hovermode: "closest",
 
-        "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+              barmode: "stack",
 
-        "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+              paper_bgcolor: "transparent",
 
-        "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+              plot_bgcolor: "transparent",
 
-        "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
+              font: {
+                color: isDark ? "#e2e8f0" : "#0f172a",
+              },
 
-        "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+              margin: {
+                t: 20,
+                l: 70,
+                r: 20,
+                b: 40,
+              },
 
-        "<extra></extra>",
-    },
+              xaxis: {
+                tickprefix: "$",
 
-    {
-      x: rows.map(
-        (r) =>
-          r.beginBalance
-      ),
+                tickformat: ",.0f",
 
-      y: rows.map(
-        (r) => `${r.year}`
-      ),
+                gridcolor: isDark ? "#1e293b" : "#e2e8f0",
 
-      type: "bar",
+                zeroline: false,
+              },
 
-      orientation: "h",
+              yaxis: {
+                autorange: "reversed",
 
-      name: "Principal",
+                gridcolor: isDark ? "#1e293b" : "#e2e8f0",
+              },
 
-      marker: {
-        color: "#65a30d",
-      },
+              legend: {
+                orientation: "h",
 
-      customdata: rows.map(
-        (r) => [
-          r.beginBalance,
-          r.rmd,
-          r.tax,
-          r.growth,
-          r.endBalance,
-        ]
-      ),
+                y: -0.18,
 
-      hovertemplate:
-        "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
-        "Financial Projection" +
-        "</span><br><br>" +
+                x: 0.5,
 
-        "<b>Year:</b> %{y}<br>" +
+                xanchor: "center",
+              },
 
-        "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+              hoverlabel: {
+                bgcolor: "#071226",
 
-        "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
+                bordercolor: "#1e3a8a",
 
-        "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
+                font: {
+                  color: "#ffffff",
+                  size: 13,
+                  family: "Inter, sans-serif",
+                },
 
-        "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-
-        "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
-
-        "<extra></extra>",
-    },
-
-    {
-      x: rows.map(
-        (r) => r.rmd
-      ),
-
-      y: rows.map(
-        (r) => `${r.year}`
-      ),
-
-      type: "bar",
-
-      orientation: "h",
-
-      name: "RMD",
-
-      marker: {
-        color: "#9333ea",
-      },
-
-      customdata: rows.map(
-        (r) => [
-          r.beginBalance,
-          r.rmd,
-          r.tax,
-          r.growth,
-          r.endBalance,
-        ]
-      ),
-
-      hovertemplate:
-        "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
-        "Financial Projection" +
-        "</span><br><br>" +
-
-        "<b>Year:</b> %{y}<br>" +
-
-        "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-
-        "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-
-        "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-
-        "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-
-        "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
-
-        "<extra></extra>",
-    },
-
-    {
-      x: rows.map(
-        (r) => r.tax
-      ),
-
-      y: rows.map(
-        (r) => `${r.year}`
-      ),
-
-      type: "bar",
-
-      orientation: "h",
-
-      name: "Tax",
-
-      marker: {
-        color: "#ef4444",
-      },
-
-      customdata: rows.map(
-        (r) => [
-          r.beginBalance,
-          r.rmd,
-          r.tax,
-          r.growth,
-          r.endBalance,
-        ]
-      ),
-
-      hovertemplate:
-        "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
-        "Financial Projection" +
-        "</span><br><br>" +
-
-        "<b>Year:</b> %{y}<br>" +
-
-        "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-
-        "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-
-        "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-
-        "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-
-        "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
-
-        "<extra></extra>",
-    },
-  ]}
-  layout={{
-    hovermode: "closest",
-
-    barmode: "stack",
-
-    paper_bgcolor:
-      "transparent",
-
-    plot_bgcolor:
-      "transparent",
-
-    font: {
-      color: isDark
-        ? "#e2e8f0"
-        : "#0f172a",
-    },
-
-    margin: {
-      t: 20,
-      l: 70,
-      r: 20,
-      b: 40,
-    },
-
-    xaxis: {
-      tickprefix: "$",
-
-      tickformat: ",.0f",
-
-      gridcolor: isDark
-        ? "#1e293b"
-        : "#e2e8f0",
-
-      zeroline: false,
-    },
-
-    yaxis: {
-      autorange: "reversed",
-
-      gridcolor: isDark
-        ? "#1e293b"
-        : "#e2e8f0",
-    },
-
-    legend: {
-      orientation: "h",
-
-      y: -0.18,
-
-      x: 0.5,
-
-      xanchor: "center",
-    },
-
-    hoverlabel: {
-      bgcolor: "#071226",
-
-      bordercolor: "#1e3a8a",
-
-      font: {
-        color: "#ffffff",
-        size: 13,
-        family:
-          "Inter, sans-serif",
-      },
-
-      align: "left",
-    },
-  }}
-/>
+                align: "left",
+              },
+            }}
+          />
         )}
       </Box>
     </Box>
