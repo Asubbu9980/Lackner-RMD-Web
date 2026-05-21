@@ -71,18 +71,24 @@ def render_scene(
     ] = render_data_path
 
     command = [
-
-        "manim",
         
+        
+        "manim",
+
         "-pql",
 
-        
+        "--fps",
+        "24",
+
+        "--resolution",
+        "854,480",
+
         scene_config["file"],
-        
+
         scene_config["class"]
     ]
 
-    subprocess.run(command)
+    subprocess.run(command, check=True)
 
     media_folder = (
         "media/videos"
