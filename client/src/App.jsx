@@ -4,6 +4,7 @@ import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/st
 import { useMemo } from "react";
 import { getDesignTokens } from "./theme";
 import Calculator from "./pages/Calculator";
+import { RenderModeProvider } from "./context/RenderModeContext";
 
 const AppContent = () => {
   const { mode } = useThemeContext();
@@ -12,7 +13,9 @@ const AppContent = () => {
   return (
     <MuiThemeProvider theme={muiTheme}>
       <RmdProvider>
-        <Calculator />
+        <RenderModeProvider>
+          <Calculator />
+        </RenderModeProvider>
       </RmdProvider>
     </MuiThemeProvider>
   );

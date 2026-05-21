@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useRenderMode } from "../context/RenderModeContext";
+import useRmd from "../hooks/useRmd";
 
 import Header from "../components/Header";
 import InputForm from "../components/InputForm";
@@ -6,12 +8,15 @@ import WaterfallChart from "../components/WaterfallChart";
 import AdvancedChart from "../components/AdvancedChart";
 import DataTable from "../components/DataTable";
 
+import { generateProjection } from "../services/pythonapi";
+
 import { Activity, Waves, Table2 } from "lucide-react";
 
 const Calculator = () => {
   // =====================================================
   // DISPLAY STATES
   // =====================================================
+  const { inputs } = useRmd();
 
   const [showChart, setShowChart] = useState(true);
 
@@ -20,6 +25,67 @@ const Calculator = () => {
   const [showGrowth, setShowGrowth] = useState(false);
 
   const [showTax, setShowTax] = useState(true);
+  const { renderMode } = useRenderMode();
+
+  const [videoUrl, setVideoUrl] = useState("");
+
+  const [isRendering, setIsRendering] = useState(false);
+
+  const generateCinematic = async () => {
+    try {
+      const deathRequiredScenarios = [
+        "DECEASED_SPOUSE_INHERIT",
+
+        "DECEASED_EDB_SINGLELIFE",
+
+        "DECEASED_10YEAR",
+
+        "DECEASED_10YEAR_ANNUAL",
+      ];
+
+      if (
+        deathRequiredScenarios.includes(inputs.scenario.value) &&
+        !inputs.date_Death_Owner
+      ) {
+        alert("Date of Death is required for this scenario.");
+
+        return;
+      }
+      setIsRendering(true);
+
+      const payload = {
+        balance_Start: Number(inputs.balance_Start),
+
+        growth_Rate: Number(inputs.growth_Rate),
+
+        tax_Rate: Number(inputs.tax_Rate),
+
+        year_Birth_Owner: Number(inputs.year_Birth_Owner),
+
+        year_Birth_Beny: Number(inputs.year_Birth_Beny),
+
+        date_Death_Owner: inputs.date_Death_Owner,
+
+        scenario: inputs.scenario,
+
+        plan: inputs.plan,
+      };
+      console.log(payload);
+
+      const response = await generateProjection(inputs.scenario, payload);
+
+      const fullVideoUrl = `http://localhost:8000${response.video_url}`;
+
+      setVideoUrl(fullVideoUrl);
+
+      console.log(inputs.scenario);
+      console.log(typeof inputs.scenario);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsRendering(false);
+    }
+  };
 
   return (
     <div
@@ -224,7 +290,140 @@ const Calculator = () => {
 
                   {/* CHART */}
 
-                  <AdvancedChart />
+                  {/* CHART */}
+
+                  {renderMode === "node" ? (
+                    <AdvancedChart />
+                  ) : (
+                    <div
+                      className="
+      relative
+
+      w-full
+
+      min-h-[500px]
+      xl:min-h-[700px]
+
+      rounded-3xl
+      overflow-hidden
+
+      border
+      border-purple-500/20
+
+      bg-black
+
+      flex
+      items-center
+      justify-center
+    "
+                    >
+                      <button
+                        onClick={generateCinematic}
+                        className="
+        absolute
+        top-4
+        right-4
+        z-20
+
+        px-5
+        py-2
+
+        rounded-xl
+
+        bg-gradient-to-r
+            from-cyan-400
+            to-blue-500
+
+            text-white
+
+            shadow-[0_0_20px_rgba(0,212,255,0.35)]
+          `
+          : `
+            text-[var(--text-secondary)]
+
+            hover:text-white
+
+        transition-all
+      "
+                      >
+                        Generate Manim Analytics
+                      </button>
+
+                      {/* LOADING */}
+
+                      {isRendering && (
+                        <div
+                          className="
+          absolute
+          inset-0
+          z-20
+
+          flex
+          flex-col
+          items-center
+          justify-center
+
+          bg-black/90
+          backdrop-blur-md
+        "
+                        >
+                          <div
+                            className="
+            w-16
+            h-16
+
+            rounded-full
+
+            border-4
+            border-cyan-400
+            border-t-transparent
+
+            animate-spin
+          "
+                          />
+
+                          <p
+                            className="
+            mt-6
+
+            text-cyan-300
+
+            text-lg
+            font-semibold
+          "
+                          >
+                            Rendering Manim Analytics...
+                          </p>
+                        </div>
+                      )}
+
+                      {/* VIDEO */}
+
+                      {videoUrl && (
+                        <video
+  key={videoUrl}
+  controls
+  autoPlay
+  preload="auto"
+  className="
+    w-full
+    h-full
+
+    object-cover
+
+    rounded-b-3xl
+
+    bg-black
+  "
+>
+  <source
+    src={videoUrl}
+    type="video/mp4"
+  />
+</video>
+                      )}
+                    </div>
+                  )}
                 </section>
               )}
 

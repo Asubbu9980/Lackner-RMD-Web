@@ -207,7 +207,7 @@ const CascadeFlow3D = ({ mode = "PROJECTION" }) => {
       )}
 
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
-        <CinematicLabel text={mode === "PROJECTION" ? "Wealth Intelligence Stream" : "Lifecycle Distribution Flow"} fontSize="28px" color="#fff" />
+        <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
       <CinematicLegend items={legendItems} />
     </div>

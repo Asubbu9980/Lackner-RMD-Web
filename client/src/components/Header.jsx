@@ -1,21 +1,16 @@
 import SummaryCards from "./SummaryCards";
 
-import {
-  Moon,
-  Sun,
-  Sparkles,
-} from "lucide-react";
+import { Moon, Sun, Sparkles } from "lucide-react";
 
 import { useThemeContext } from "../context/ThemeContext";
+import { useRenderMode } from "../context/RenderModeContext";
 
 const Header = () => {
-  const {
-    mode,
-    toggleTheme,
-  } = useThemeContext();
+  const { mode, toggleTheme } = useThemeContext();
 
-  const isDark =
-    mode === "dark";
+  const { renderMode, setRenderMode } = useRenderMode();
+
+  const isDark = mode === "dark";
 
   return (
     <header
@@ -135,10 +130,7 @@ const Header = () => {
                 mb-3
               "
             >
-              <Sparkles
-                size={12}
-                className="text-cyan-300"
-              />
+              <Sparkles size={12} className="text-cyan-300" />
 
               <span
                 className="
@@ -167,8 +159,7 @@ const Header = () => {
                 text-[var(--text-primary)]
               "
             >
-              RMD Projection
-              Workspace
+              RMD Projection Workspace
             </h1>
 
             {/* SUBTITLE */}
@@ -183,9 +174,7 @@ const Header = () => {
                 text-[var(--text-secondary)]
               "
             >
-              Backend-driven wealth,
-              tax and retirement
-              distribution analytics
+              Backend-driven wealth, tax and retirement distribution analytics
             </p>
           </div>
 
@@ -248,6 +237,97 @@ const Header = () => {
               </span>
             </div>
 
+            {/* RENDER MODE TOGGLE */}
+
+            <div
+              className="
+    flex
+    items-center
+
+    p-1
+
+    rounded-2xl
+
+    border
+    border-white/10
+
+    bg-white/5
+    backdrop-blur-md
+  "
+            >
+              <button
+                onClick={() => setRenderMode("node")}
+                className={`
+      px-5
+      py-2.5
+
+      rounded-xl
+
+      text-xs
+      font-semibold
+
+      transition-all
+      duration-300
+
+      ${
+        renderMode === "node"
+          ? `
+            bg-gradient-to-r
+            from-cyan-400
+            to-blue-500
+
+            text-white
+
+            shadow-[0_0_20px_rgba(0,212,255,0.35)]
+          `
+          : `
+            text-[var(--text-secondary)]
+
+            hover:text-white
+          `
+      }
+    `}
+              >
+                Three D
+              </button>
+
+              <button
+                onClick={() => setRenderMode("python")}
+                className={`
+      px-5
+      py-2.5
+
+      rounded-xl
+
+      text-xs
+      font-semibold
+
+      transition-all
+      duration-300
+
+      ${
+        renderMode === "python"
+          ? `
+            bg-gradient-to-r
+            from-cyan-400
+            to-blue-500
+
+            text-white
+
+            shadow-[0_0_20px_rgba(0,212,255,0.35)]
+          `
+          : `
+            text-[var(--text-secondary)]
+
+            hover:text-white
+          `
+      }
+    `}
+              >
+                3Blue1Brown
+              </button>
+            </div>
+
             {/* THEME TOGGLE */}
 
             <button
@@ -308,15 +388,9 @@ const Header = () => {
 
               <div className="relative z-10">
                 {isDark ? (
-                  <Sun
-                    size={16}
-                    className="text-yellow-300"
-                  />
+                  <Sun size={16} className="text-yellow-300" />
                 ) : (
-                  <Moon
-                    size={16}
-                    className="text-slate-700"
-                  />
+                  <Moon size={16} className="text-slate-700" />
                 )}
               </div>
 
@@ -333,9 +407,7 @@ const Header = () => {
                   text-[var(--text-primary)]
                 "
               >
-                {isDark
-                  ? "Light Mode"
-                  : "Dark Mode"}
+                {isDark ? "Light Mode" : "Dark Mode"}
               </span>
             </button>
           </div>

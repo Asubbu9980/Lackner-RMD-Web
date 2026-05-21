@@ -113,7 +113,7 @@ const ThreeDBarChart = ({ data, formatCurrency }) => {
       )}
 
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
-        <CinematicLabel text="Cyber-Skyline Distribution" fontSize="28px" color="#fff" />
+        <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
       <CinematicLegend items={legendItems} />
     </div>

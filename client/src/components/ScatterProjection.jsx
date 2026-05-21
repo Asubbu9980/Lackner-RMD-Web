@@ -109,7 +109,7 @@ const ScatterProjection = () => {
       )}
 
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
-        <CinematicLabel text="Kinetic Wealth Galaxy" fontSize="28px" color="#fff" />
+        <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
       <CinematicLegend items={[{ label: "Market Growth", color: "#10b981" }, { label: "Tax Liability", color: "#ef4444" }, { label: "RMD Withdrawals", color: "#a855f7" }]} />
     </div>

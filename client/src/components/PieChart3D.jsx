@@ -1,4 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/immutability */
+ 
 /* eslint-disable no-unused-vars */
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -101,7 +102,7 @@ const PieChart3D = ({ data }) => {
       )}
 
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
-        <CinematicLabel text="Glass Orbital Composition" fontSize="28px" color="#fff" />
+        <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
       <CinematicLegend items={legendItems} />
     </div>

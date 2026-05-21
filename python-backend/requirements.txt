@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+gunicorn
+pydantic
+numpy
+matplotlib
+pandas
+manim
+
+python-multipart
+networkx
+scipy
+Pillow
+tqdm
+rich
+click

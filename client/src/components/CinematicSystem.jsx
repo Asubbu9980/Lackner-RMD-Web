@@ -1,4 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/purity */
+/* eslint-disable react-hooks/set-state-in-effect */
+ 
 /* eslint-disable no-unused-vars */
 import React, { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";

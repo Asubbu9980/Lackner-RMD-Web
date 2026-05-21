@@ -87,7 +87,7 @@ const ThreeDCandleChart = ({ data }) => {
       )}
 
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
-        <CinematicLabel text="Market Volatility" fontSize="28px" color="#fff" />
+        <CinematicLabel fontSize="28px" color="#fff" />
       </div>
       <CinematicLegend items={[{ label: "Positive Movement", color: "#10b981" }, { label: "Negative Movement", color: "#f43f5e" }]} />
     </div>
