@@ -19,13 +19,13 @@ import ThreeDBarChart from "./ThreeDBarChart";
 // import ThreeDCandleChart from "./ThreeDCandleChart";
 // import ScatterProjection from "./ScatterProjection";
 // import GlobalAnalytics from "./GlobalAnalytics";
-import Projection2D from "./charts2d/Projection2D";
-import Bar2D from "./charts2d/Bar2D";
-import Pie2D from "./charts2d/Pie2D";
-import Mountain2D from "./charts2d/Mountain2D";
-import Scatter2D from "./charts2d/Scatter2D";
-import Candle2D from "./charts2d/Candle2D";
-import Analytics2D from "./charts2d/Analytics2D";
+import Projection2D from "./charts2D/Projection2D";
+import Bar2D from "./charts2D/Bar2D";
+import Pie2D from "./charts2D/Pie2D";
+import Mountain2D from "./charts2D/Mountain2D";
+import Scatter2D from "./charts2D/Scatter2D";
+import Candle2D from "./charts2D/Candle2D";
+import Analytics2D from "./charts2D/Analytics2D";
 
 import { formatCurrency } from "../utils/format";
 
