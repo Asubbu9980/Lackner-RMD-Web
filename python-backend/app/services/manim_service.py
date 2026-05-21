@@ -73,6 +73,8 @@ def render_scene(
     command = [
 
         "manim",
+        
+        "-pql",
 
         
         scene_config["file"],
