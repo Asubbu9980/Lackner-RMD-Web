@@ -74,7 +74,7 @@ const Calculator = () => {
 
       const response = await generateProjection(inputs.scenario, payload);
 
-      const fullVideoUrl = `http://localhost:8000${response.video_url}`;
+      const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
 
       setVideoUrl(fullVideoUrl);
 
