@@ -1,5 +1,5 @@
 const API_BASE =
-  "http://localhost:8000";
+  "https://python-backend-rmd.onrender.com";
 
 export const generateProjection =
   async (
