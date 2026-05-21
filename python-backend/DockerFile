@@ -1,11 +1,24 @@
-FROM manimcommunity/manim:stable
+FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY . .
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libcairo2 \
+    libcairo2-dev \
+    pkg-config \
+    python3-dev \
+    build-essential \
+    texlive \
+    texlive-latex-extra \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install fastapi uvicorn gunicorn python-multipart
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 10000
 
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]

@@ -5,4 +5,5 @@ pydantic
 numpy
 matplotlib
 pandas
+manim
 python-multipart
