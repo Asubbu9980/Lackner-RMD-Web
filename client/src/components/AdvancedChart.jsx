@@ -14,11 +14,11 @@ import {
 
 import CascadeFlow3D from "./CascadeFlow3D";
 import ThreeDBarChart from "./ThreeDBarChart";
-// import PieChart3D from "./PieChart3D";
-// import WealthMountainSurface from "./WealthMountainSurface";
-// import ThreeDCandleChart from "./ThreeDCandleChart";
-// import ScatterProjection from "./ScatterProjection";
-// import GlobalAnalytics from "./GlobalAnalytics";
+import PieChart3D from "./PieChart3D";
+import WealthMountainSurface from "./WealthMountainSurface";
+import ThreeDCandleChart from "./ThreeDCandleChart";
+import ScatterProjection from "./ScatterProjection";
+import GlobalAnalytics from "./GlobalAnalytics";
 import Projection2D from "./charts2D/Projection2D";
 import Bar2D from "./charts2D/Bar2D";
 import Pie2D from "./charts2D/Pie2D";
@@ -482,7 +482,7 @@ const AdvancedChart = () => {
 
               
 
-              {/* {view === "mountain" && <WealthMountainSurface data={data} />}
+              {view === "mountain" && <WealthMountainSurface data={data} />}
 
              
 
@@ -648,7 +648,7 @@ const AdvancedChart = () => {
                       })}
                   </Box>
                 </Box>
-              )} */}
+              )}
             </>
           )}
         </Box>
