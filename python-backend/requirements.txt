@@ -7,5 +7,5 @@ matplotlib==3.9.2
 pandas==2.2.3
 python-multipart==0.0.9
 manim==0.18.1
-edge-tts==7.2.37.2.3
+edge-tts==7.2.8
 moviepy==2.2.1
