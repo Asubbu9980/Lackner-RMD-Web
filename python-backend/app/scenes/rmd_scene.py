@@ -262,14 +262,16 @@ class RmdGrowthScene(Scene):
 
         peak_index = balances.index(max(balances))
 
+        peak_value = balances[peak_index]
+
         peak_point = axes.c2p(
 
-            normalized_years[peak_index],
+        normalized_years[peak_index],
 
-            normalized_balances[peak_index]
+        normalized_balances[peak_index]
         )
 
-        peak_dot = Dot(
+        peak_dot   = Dot(
 
             peak_point,
 
@@ -278,13 +280,23 @@ class RmdGrowthScene(Scene):
             color=YELLOW
         )
 
-        peak_label = Text(
+        peak_label = VGroup(
 
-            "Peak Wealth",
+            Text(
+                "Peak Wealth",
+                font_size=14,
+                color=YELLOW
+            ),
 
-            font_size=14,
+            Text(
+                f"${int(peak_value):,}",
+                font_size=12,
+                color=WHITE
+            )
 
-            color=YELLOW
+        ).arrange(
+            DOWN,
+            buff=0.05
         )
 
         peak_label.next_to(
@@ -642,4 +654,4 @@ class RmdGrowthScene(Scene):
         # FINAL HOLD
         # ======================================================
 
-        self.wait(1)
+        self.wait(3)

@@ -4,6 +4,11 @@ import uuid
 import os
 import shutil
 import time
+import asyncio
+
+from app.services.voice_service import generate_voice
+from app.services.narration_service import create_narration
+from app.services.video_merge import merge_audio_video
 
 
 SCENE_REGISTRY = {
@@ -60,7 +65,10 @@ def render_scene(scene_type, chart_data):
         scene_config["class"]
     ]
 
-    subprocess.run(command, check=True)
+    subprocess.run(
+        command,
+        check=True
+    )
 
     media_folder = "media/videos"
 
@@ -76,19 +84,91 @@ def render_scene(scene_type, chart_data):
 
             if file.endswith(".mp4"):
 
-                full_path = os.path.join(root, file)
+                full_path = os.path.join(
+                    root,
+                    file
+                )
 
-                modified_time = os.path.getmtime(full_path)
+                modified_time = os.path.getmtime(
+                    full_path
+                )
 
                 if modified_time > latest_time:
 
                     latest_time = modified_time
+
                     rendered_video = full_path
 
-    final_video = f"media/videos/{scene_id}.mp4"
+    if not rendered_video:
 
-    shutil.copy(rendered_video, final_video)
+        raise Exception(
+            "No rendered video found."
+        )
+
+    final_video = (
+        f"media/videos/{scene_id}.mp4"
+    )
+
+    shutil.copy(
+        rendered_video,
+        final_video
+    )
+
+    # ==========================================
+    # GENERATE NARRATION
+    # ==========================================
+
+    narration = create_narration(
+        chart_data
+    )
+
+    audio_file = (
+        f"media/videos/{scene_id}.mp3"
+    )
+
+    asyncio.run(
+
+        generate_voice(
+            narration,
+            audio_file
+        )
+
+    )
+
+    # ==========================================
+    # MERGE AUDIO + VIDEO
+    # ==========================================
+
+    merged_video = (
+        f"media/videos/{scene_id}_final.mp4"
+    )
+
+    merge_audio_video(
+
+        final_video,
+
+        audio_file,
+
+        merged_video
+
+    )
+
+    # ==========================================
+    # CLEANUP TEMP FILES
+    # ==========================================
+
+    try:
+
+        if os.path.exists(audio_file):
+
+            os.remove(audio_file)
+
+    except Exception:
+
+        pass
 
     time.sleep(1)
 
-    return f"/media/videos/{scene_id}.mp4"
+    return (
+        f"/media/videos/{scene_id}_final.mp4"
+    )
