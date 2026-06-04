@@ -41,7 +41,7 @@ class PortfolioCollapseScene(Scene):
 
         normalized_balances = [
 
-            ((b / max_balance) * 6) + 1
+            (b / max_balance) * 5.5
 
             for b in balances
         ]
@@ -52,13 +52,13 @@ class PortfolioCollapseScene(Scene):
 
         title = Text(
             "Portfolio Collapse Dynamics",
-            font_size=42,
+            font_size=34,
             color=WHITE
         )
 
         subtitle = Text(
             "Retirement depletion accelerates over time",
-            font_size=22,
+            font_size=16,
             color=RED_C
         )
 
@@ -70,7 +70,7 @@ class PortfolioCollapseScene(Scene):
         self.play(
             FadeIn(title),
             FadeIn(subtitle),
-            run_time=2
+            run_time=1
         )
 
         self.play(
@@ -78,7 +78,7 @@ class PortfolioCollapseScene(Scene):
                 title,
                 subtitle
             ).animate.to_edge(UP),
-            run_time=2
+            run_time=0.5
         )
 
         # =========================
@@ -96,44 +96,31 @@ class PortfolioCollapseScene(Scene):
             y_length=5
         )
 
-        axes.shift(DOWN)
+        
 
         self.play(
             Create(axes),
-            run_time=2
+            run_time=0.8
         )
 
+                # =========================
+        # PORTFOLIO BARS
         # =========================
-        # CURVE POINTS
-        # =========================
 
-        curve_points = [
+        bars = VGroup()
 
-            axes.c2p(i+1, y)
+        for i in range(len(years)):
 
-            for i, y in enumerate(
-                normalized_balances
+            height = max(
+                normalized_balances[i],
+                0.05
             )
-        ]
 
-        # =========================
-        # COLLAPSE CURVE
-        # =========================
-
-        curve_segments = VGroup()
-
-        for i in range(len(curve_points) - 1):
-
-            start = curve_points[i]
-            end = curve_points[i + 1]
-
-            progress = i / len(curve_points)
-
-            if progress < 0.4:
+            if i < len(years) * 0.4:
 
                 color = BLUE_C
 
-            elif progress < 0.7:
+            elif i < len(years) * 0.7:
 
                 color = YELLOW_C
 
@@ -141,205 +128,165 @@ class PortfolioCollapseScene(Scene):
 
                 color = RED_C
 
-            glow_segment = Line(
-                start,
-                end,
-                stroke_width=18,
-                color=color,
-                stroke_opacity=0.18
+            bar = Rectangle(
+                width=0.22,
+                height=height,
+                fill_color=color,
+                fill_opacity=0.9,
+                stroke_width=0
             )
 
-            segment = Line(
-                start,
-                end,
-                stroke_width=5,
-                color=color
+            bar.move_to(
+                axes.c2p(
+                    i + 1,
+                    height / 2
+                )
             )
 
-            curve_segments.add(glow_segment)
-            curve_segments.add(segment)
+            bars.add(bar)
 
         self.play(
-
             LaggedStart(
                 *[
-                    Create(segment)
-                    for segment in curve_segments
+                    GrowFromEdge(bar, DOWN)
+                    for bar in bars
                 ],
-                lag_ratio=0.02
+                lag_ratio=0.03
+            ),
+            run_time=2
+        )
+
+        peak_index = balances.index(
+            max(balances)
+        )
+
+        peak_balance = int(
+            max(balances)
+        )
+
+        peak_bar = bars[peak_index]
+
+        peak_bar.set_fill(
+            GREEN_C,
+            opacity=1
+        )
+
+        peak_label = Text(
+            f"Peak Wealth\n${peak_balance:,}",
+            font_size=14,
+            color=GREEN_C
+        )
+
+        peak_label.next_to(
+            peak_bar,
+            UP
+        )
+
+        peak_label.scale(0.75)
+    
+
+        self.play(
+            Indicate(
+                peak_bar
+            ),
+            FadeIn(
+                peak_label
+            ),
+            run_time=1
+        )
+
+        lifespan_group = VGroup(
+
+            Text(
+                "Portfolio Lifespan",
+                font_size=16,
+                color=RED_C
             ),
 
-            run_time=7
-        )
-
-        # =========================
-        # YEAR DISPLAY
-        # =========================
-
-        year_text = Text(
-            str(years[0]),
-            font_size=34,
-            color=GREY_B
-        )
-
-        year_text.to_corner(UL)
-
-        self.play(
-            FadeIn(year_text)
-        )
-
-        # =========================
-        # TRACKER
-        # =========================
-
-        tracker = Dot(
-            curve_points[0],
-            radius=0.12,
-            color=WHITE
-        )
-
-        glow_tracker = Dot(
-            curve_points[0],
-            radius=0.30,
-            color=WHITE,
-            fill_opacity=0.15
-        )
-
-        self.play(
-            FadeIn(glow_tracker),
-            FadeIn(tracker)
-        )
-
-        # =========================
-        # COLLAPSE MOTION
-        # =========================
-
-        for i in range(len(curve_points)):
-
-            year_update = Text(
-                str(years[i]),
-                font_size=34,
-                color=GREY_B
+            Text(
+                f"{len(years)} Years",
+                font_size=24,
+                color=RED_C
             )
 
-            year_update.move_to(
-                year_text
-            )
+        ).arrange(DOWN)
 
-            progress = i / len(curve_points)
+        lifespan_group.scale(0.7)
 
-            # COLOR EVOLUTION
-
-            if progress < 0.4:
-
-                tracker_color = BLUE_C
-                glow_opacity = 0.18
-
-            elif progress < 0.7:
-
-                tracker_color = YELLOW_C
-                glow_opacity = 0.12
-
-            else:
-
-                tracker_color = RED_C
-                glow_opacity = 0.05
-
-            self.play(
-
-                tracker.animate
-                .move_to(curve_points[i])
-                .set_color(tracker_color),
-
-                glow_tracker.animate
-                .move_to(curve_points[i])
-                .set_color(tracker_color)
-                .set_opacity(glow_opacity),
-
-                Transform(
-                    year_text,
-                    year_update
-                ),
-
-                run_time=0.12
-            )
-
-        # =========================
-        # COLLAPSE WAVE
-        # =========================
-
-        collapse_wave = Circle(
-            radius=0.3,
-            color=RED_C,
-            stroke_width=6
-        )
-
-        collapse_wave.move_to(
-            curve_points[-1]
-        )
+        lifespan_group.to_corner(UR)
 
         self.play(
-            GrowFromCenter(
-                collapse_wave
-            ),
-            run_time=1.5
-        )
-
-        self.play(
-            collapse_wave.animate.scale(8)
-            .set_opacity(0),
-            run_time=3
-        )
-
-        # =========================
-        # FINAL IMPLOSION
-        # =========================
-
-        final_flash = Dot(
-            curve_points[-1],
-            radius=0.4,
-            color=RED_C
-        )
-
-        self.play(
-            FadeIn(final_flash),
+            FadeIn(lifespan_group),
             run_time=0.5
         )
 
-        self.play(
-            final_flash.animate.scale(4)
-            .set_opacity(0),
-            run_time=2
-        )
+        
 
         # =========================
         # DEPLETION WARNING
         # =========================
 
-        warning = Text(
-            "Portfolio depletion risk\nbecomes severe in later years.",
-            font_size=30,
-            color=WHITE
+        ending_balance = int(
+            balances[-1]
         )
 
-        warning.to_edge(DOWN)
+        value_group = VGroup(
+
+            Text(
+                "Ending Portfolio",
+                font_size=16,
+                color=WHITE
+            ),
+
+            Text(
+                f"${ending_balance:,}",
+                font_size=24,
+                color=RED_C
+            )
+
+        ).arrange(DOWN)
+
+        value_group.scale(0.7)
+
+        value_group.to_corner(DR)
 
         self.play(
-            Write(warning),
-            run_time=3
+            FadeIn(value_group),
+            run_time=0.5
         )
 
-        # =========================
-        # FINAL DIM
-        # =========================
+        summary_group = VGroup(
+
+            Text(
+                "Collapse Risk",
+                font_size=16,
+                color=RED_C
+            ),
+
+            Text(
+                "Withdrawals eventually\noutpace portfolio growth.",
+                font_size=12,
+                color=GREY_A
+            )
+
+        ).arrange(
+            DOWN,
+            aligned_edge=LEFT
+        )
+
+        summary_group.scale(0.8)
+
+        summary_group.next_to(
+            value_group,
+            UP,
+            buff=0.8
+        )
 
         self.play(
-
-            FadeOut(glow_tracker),
-
-            tracker.animate.set_opacity(0.2),
-
-            run_time=3
+            FadeIn(summary_group),
+            run_time=0.5
         )
 
-        self.wait(4)
+        self.wait(7)
+
+        

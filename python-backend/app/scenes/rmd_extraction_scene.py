@@ -9,9 +9,9 @@ class RmdExtractionScene(Scene):
 
     def construct(self):
 
-        # =========================
+        # =====================================================
         # LOAD DATA
-        # =========================
+        # =====================================================
 
         data_file = os.environ.get(
             "RENDER_DATA_FILE"
@@ -38,35 +38,39 @@ class RmdExtractionScene(Scene):
                 row["rmd"]
             )
 
-        # =========================
+        # =====================================================
         # NORMALIZATION
-        # =========================
+        # =====================================================
 
         max_balance = max(balances)
 
         normalized_balances = [
-            ((b / max_balance) * 6) + 1
+
+            ((b / max_balance) * 8) + 0.5
+
             for b in balances
         ]
 
         normalized_rmds = [
+
             (r / max_balance) * 8
+
             for r in rmds
         ]
 
-        # =========================
+        # =====================================================
         # TITLE
-        # =========================
+        # =====================================================
 
         title = Text(
             "RMD Extraction Dynamics",
-            font_size=42,
+            font_size=36,
             color=WHITE
         )
 
         subtitle = Text(
             "Mandatory withdrawals weaken long-term wealth",
-            font_size=22,
+            font_size=18,
             color=PURPLE_C
         )
 
@@ -78,7 +82,7 @@ class RmdExtractionScene(Scene):
         self.play(
             FadeIn(title),
             FadeIn(subtitle),
-            run_time=2
+            run_time=1
         )
 
         self.play(
@@ -86,80 +90,64 @@ class RmdExtractionScene(Scene):
                 title,
                 subtitle
             ).animate.to_edge(UP),
-            run_time=2
+            run_time=0.5
         )
 
-        # =========================
+        # =====================================================
+        # TOTAL RMD CARD
+        # =====================================================
+
+        total_rmd = int(
+            sum(rmds)
+        )
+
+        metric_title = Text(
+            "Total Withdrawn",
+            font_size=16,
+            color=PURPLE_C
+        )
+
+        metric_value = Text(
+            f"${total_rmd:,}",
+            font_size=24,
+            color=PURPLE_C
+        )
+
+        metric_group = VGroup(
+            metric_title,
+            metric_value
+        ).arrange(DOWN)
+
+        metric_group.scale(0.7)
+
+        metric_group.to_corner(UR)
+
+        self.play(
+            FadeIn(metric_group),
+            run_time=0.5
+        )
+                # =====================================================
         # AXES
-        # =========================
+        # =====================================================
 
         axes = Axes(
-            x_range=[0, len(years)+1, 5],
-            y_range=[0, 10, 2],
+            x_range=[0, len(years) + 1, 5],
+            y_range=[0, max(normalized_rmds) * 1.3, 1],
             axis_config={
                 "include_numbers": False,
                 "color": BLUE_E
             },
             x_length=11,
-            y_length=5
+            y_length=5.5
         )
 
-        axes.shift(DOWN)
+        axes.shift(DOWN * 0.4)
 
-        self.play(
-            Create(axes),
-            run_time=2
-        )
+        self.play(Create(axes), run_time=0.8)
 
-        # =========================
-        # BALANCE CURVE
-        # =========================
-
-        curve_points = [
-
-            axes.c2p(i+1, y)
-
-            for i, y in enumerate(
-                normalized_balances
-            )
-        ]
-
-        balance_curve = VMobject()
-
-        balance_curve.set_points_smoothly(
-            curve_points
-        )
-
-        balance_curve.set_stroke(
-            BLUE_C,
-            width=4,
-            opacity=0.4
-        )
-
-        self.play(
-            Create(balance_curve),
-            run_time=4
-        )
-
-        # =========================
-        # YEAR DISPLAY
-        # =========================
-
-        year_text = Text(
-            str(years[0]),
-            font_size=34,
-            color=GREY_B
-        )
-
-        year_text.to_corner(UL)
-
-        self.play(
-            FadeIn(year_text)
-        )
-
-        # =========================
-        # RMD EXTRACTION BARS
-        # =========================
+        # =====================================================
+        # LARGE RMD BARS
+        # =====================================================
 
         bars = VGroup()
 
@@ -171,167 +159,129 @@ class RmdExtractionScene(Scene):
             )
 
             bar = Rectangle(
-                width=0.18,
+                width=0.22,
                 height=height,
                 fill_color=PURPLE_C,
-                fill_opacity=0.85,
+                fill_opacity=0.9,
                 stroke_width=0
             )
-
-            glow = Rectangle(
-                width=0.18,
-                height=height,
-                fill_color=PURPLE_C,
-                fill_opacity=0.15,
-                stroke_width=0
-            )
-
-            glow.scale(1.6)
 
             bar.move_to(
                 axes.c2p(
-                    i+1,
+                    i + 1,
                     height / 2
                 )
             )
 
-            glow.move_to(
-                axes.c2p(
-                    i+1,
-                    height / 2
-                )
-            )
-
-            bars.add(glow)
             bars.add(bar)
 
         self.play(
-
             LaggedStart(
                 *[
-                    GrowFromEdge(
-                        bar,
-                        DOWN
-                    )
+                    GrowFromEdge(bar, DOWN)
                     for bar in bars
                 ],
-                lag_ratio=0.02
+                lag_ratio=0.03
+            ),
+            run_time=2
+        )
+
+        # =====================================================
+        # PEAK RMD
+        # =====================================================
+
+        peak_index = rmds.index(max(rmds))
+
+        peak_bar = bars[peak_index]
+
+        peak_bar.set_fill(
+            YELLOW,
+            opacity=1
+        )
+
+        peak_label = Text(
+            f"Peak RMD\n${int(max(rmds)):,}",
+            font_size=20,
+            color=YELLOW
+        )
+
+        peak_label.next_to(
+            peak_bar,
+            UP
+        )
+
+        self.play(
+            Indicate(
+                peak_bar,
+                scale_factor=1.15
+            ),
+            FadeIn(peak_label),
+            run_time=1
+        )
+
+        # =====================================================
+        # ENDING VALUE
+        # =====================================================
+
+        ending_balance = int(
+            balances[-1]
+        )
+
+        value_group = VGroup(
+
+            Text(
+                "Ending Portfolio",
+                font_size=16,
+                color=WHITE
             ),
 
-            run_time=5
-        )
-
-        # =========================
-        # EXTRACTION PARTICLES
-        # =========================
-
-        particles = VGroup()
-
-        for i in range(0, len(years), 2):
-
-            particle = Dot(
-                axes.c2p(
-                    i+1,
-                    normalized_balances[i]
-                ),
-                radius=0.05,
-                color=PURPLE_A
+            Text(
+                f"${ending_balance:,}",
+                font_size=24,
+                color=GREEN_C
             )
 
-            particles.add(particle)
+        ).arrange(DOWN)
+
+        value_group.scale(0.7)
+
+        value_group.to_corner(DR)
 
         self.play(
-            LaggedStart(
-                *[
-                    particle.animate.shift(
-                        DOWN * 2
-                    )
-                    for particle in particles
-                ],
-                lag_ratio=0.05
+            FadeIn(value_group),
+            run_time=0.5
+        )
+
+        # =====================================================
+        # SUMMARY
+        # =====================================================
+
+        summary_group = VGroup(
+
+            Text(
+                "RMD Impact",
+                font_size=16,
+                color=PURPLE_C
             ),
-            run_time=4
+
+            Text(
+                "Mandatory withdrawals\naccelerate portfolio decline.",
+                font_size=12,
+                color=GREY_A
+            )
+
+        ).arrange(
+            DOWN,
+            aligned_edge=LEFT
         )
 
-        # =========================
-        # TRACKER
-        # =========================
+        summary_group.scale(0.8)
 
-        tracker = Dot(
-            curve_points[0],
-            radius=0.12,
-            color=WHITE
-        )
-
-        glow_tracker = Dot(
-            curve_points[0],
-            radius=0.25,
-            color=WHITE,
-            fill_opacity=0.15
-        )
+        summary_group.to_corner(DL)
 
         self.play(
-            FadeIn(glow_tracker),
-            FadeIn(tracker)
+            FadeIn(summary_group),
+            run_time=0.5
         )
 
-        # =========================
-        # TRACKER ANIMATION
-        # =========================
-
-        for i in range(len(curve_points)):
-
-            year_update = Text(
-                str(years[i]),
-                font_size=34,
-                color=GREY_B
-            )
-
-            year_update.move_to(
-                year_text
-            )
-
-            if i > len(curve_points) * 0.6:
-
-                color = RED_C
-
-            else:
-
-                color = WHITE
-
-            self.play(
-
-                tracker.animate
-                .move_to(curve_points[i])
-                .set_color(color),
-
-                glow_tracker.animate
-                .move_to(curve_points[i])
-                .set_color(color),
-
-                Transform(
-                    year_text,
-                    year_update
-                ),
-
-                run_time=0.12
-            )
-
-        # =========================
-        # FINAL MESSAGE
-        # =========================
-
-        final_text = Text(
-            "RMD extractions accelerate\nportfolio depletion.",
-            font_size=28,
-            color=WHITE
-        )
-
-        final_text.to_edge(DOWN)
-
-        self.play(
-            Write(final_text),
-            run_time=3
-        )
-
-        self.wait(4)
+        self.wait(9)

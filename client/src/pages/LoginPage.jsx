@@ -106,20 +106,27 @@ export default function LoginPage() {
                 mb: 5,
               }}
             >
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 800,
+              <Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+  }}
+>
 
-                  background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
 
-                  WebkitBackgroundClip: "text",
-
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Lackner RMD Projection Workspace
-              </Typography>
+  <Typography
+    variant="h5"
+    sx={{
+      fontWeight: 800,
+      background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Lackner Financial Intelligence
+  </Typography>
+</Box>
 
               <button
                 onClick={toggleTheme}
@@ -194,6 +201,17 @@ export default function LoginPage() {
                 border: "1px solid rgba(14,165,233,0.2)",
               }}
             />
+
+            <Box
+  component="img"
+  src="/logo.png"
+  alt="Lackner"
+  sx={{
+    width: 260,
+    height: "auto",
+    mb: 4,
+  }}
+/>
 
             {/* HEADING */}
             <Typography

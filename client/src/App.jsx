@@ -42,7 +42,7 @@ const AppContent = () => {
           <Routes>
 
            
-            {/* <Route
+           {/* <Route
               path="/"
               element={<LandingPage />}
             />
@@ -51,7 +51,7 @@ const AppContent = () => {
             <Route
               path="/login"
               element={<LoginPage />}
-            /> */}
+            />  */}
 
             {/* DASHBOARD */}
             <Route

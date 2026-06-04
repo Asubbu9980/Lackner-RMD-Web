@@ -119,9 +119,9 @@ def render_scene(scene_type, chart_data):
     # ==========================================
 
     narration = create_narration(
-        chart_data
+        chart_data,
+        scene_type
     )
-
     audio_file = (
         f"media/videos/{scene_id}.mp3"
     )

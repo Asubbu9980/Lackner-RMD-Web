@@ -54,20 +54,36 @@ export default function LandingPage() {
         }}
       >
         {/* LOGO */}
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: 800,
+        <Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+  }}
+>
+  <Box
+    component="img"
+    src="/logo.png"
+    alt="Lackner"
+    sx={{
+      height: 60,
+      width: 140,
+      objectFit: "contain",
+    }}
+  />
 
-            background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
-
-            WebkitBackgroundClip: "text",
-
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Lackner RMD Projection Workspace
-        </Typography>
+  <Typography
+    variant="h5"
+    sx={{
+      fontWeight: 800,
+      background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Lackner Financial Intelligence
+  </Typography>
+</Box>
 
         {/* RIGHT */}
         <Box

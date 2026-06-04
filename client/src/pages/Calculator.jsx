@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { useRenderMode } from "../context/RenderModeContext";
 import useRmd from "../hooks/useRmd";
@@ -7,6 +8,14 @@ import InputForm from "../components/InputForm";
 import WaterfallChart from "../components/WaterfallChart";
 import AdvancedChart from "../components/AdvancedChart";
 import DataTable from "../components/DataTable";
+
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 import { generateProjection } from "../services/pythonapi";
 
@@ -31,7 +40,11 @@ const Calculator = () => {
 
   const [isRendering, setIsRendering] = useState(false);
 
-  const generateCinematic = async () => {
+  const [sceneDialogOpen, setSceneDialogOpen] = useState(false);
+
+  const [sceneType, setSceneType] = useState("projection");
+
+  const generateCinematic = async (selectedScene) => {
     try {
       const deathRequiredScenarios = [
         "DECEASED_SPOUSE_INHERIT",
@@ -72,10 +85,14 @@ const Calculator = () => {
       };
       console.log(payload);
 
-      const response = await generateProjection(inputs.scenario, payload);
+      const response = await generateProjection(
+        inputs.scenario,
+        payload,
+        selectedScene,
+      );
 
       //const fullVideoUrl = `http://localhost:8000${response.video_url}`;
-    const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
+      const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
 
       setVideoUrl(fullVideoUrl);
 
@@ -319,7 +336,7 @@ const Calculator = () => {
     "
                     >
                       <button
-                        onClick={generateCinematic}
+                        onClick={() => setSceneDialogOpen(true)}
                         className="
         absolute
         top-4
@@ -402,11 +419,11 @@ const Calculator = () => {
 
                       {videoUrl && (
                         <video
-  key={videoUrl}
-  controls
-  autoPlay
-  preload="auto"
-  className="
+                          key={videoUrl}
+                          controls
+                          autoPlay
+                          preload="auto"
+                          className="
     w-full
     h-full
 
@@ -416,12 +433,9 @@ const Calculator = () => {
 
     bg-black
   "
->
-  <source
-    src={videoUrl}
-    type="video/mp4"
-  />
-</video>
+                        >
+                          <source src={videoUrl} type="video/mp4" />
+                        </video>
                       )}
                     </div>
                   )}
@@ -569,6 +583,69 @@ const Calculator = () => {
           )}
         </div>
       </div>
+      <Dialog open={sceneDialogOpen} onClose={() => setSceneDialogOpen(false)}>
+        <DialogTitle>Select Analytics Video</DialogTitle>
+
+        <DialogContent>
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              className="px-4 py-3 rounded-xl bg-cyan-500 text-white"
+              onClick={() => {
+                setSceneType("projection");
+
+                setSceneDialogOpen(false);
+
+                generateCinematic("projection");
+              }}
+            >
+              Projection Analysis
+            </button>
+
+            <button
+              className="px-4 py-3 rounded-xl bg-purple-500 text-white"
+              onClick={() => {
+                setSceneType("rmd");
+
+                setSceneDialogOpen(false);
+
+                generateCinematic("rmd");
+              }}
+            >
+              RMD Analysis
+            </button>
+
+            <button
+              className="px-4 py-3 rounded-xl bg-red-500 text-white"
+              onClick={() => {
+                setSceneType("tax");
+
+                setSceneDialogOpen(false);
+
+                generateCinematic("tax");
+              }}
+            >
+              Tax Analysis
+            </button>
+
+            <button
+              className="px-4 py-3 rounded-xl bg-orange-500 text-white"
+              onClick={() => {
+                setSceneType("collapse");
+
+                setSceneDialogOpen(false);
+
+                generateCinematic("collapse");
+              }}
+            >
+              Collapse Analysis
+            </button>
+          </div>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setSceneDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -44,12 +44,7 @@ class TaxDrainScene(Scene):
 
         max_balance = max(balances)
 
-        normalized_balances = [
-
-            ((b / max_balance) * 6) + 1
-
-            for b in balances
-        ]
+        
 
         normalized_taxes = [
 
@@ -82,7 +77,7 @@ class TaxDrainScene(Scene):
         self.play(
             FadeIn(title),
             FadeIn(subtitle),
-            run_time=2
+            run_time=1
         )
 
         self.play(
@@ -90,7 +85,7 @@ class TaxDrainScene(Scene):
                 title,
                 subtitle
             ).animate.to_edge(UP),
-            run_time=2
+            run_time=0.5
         )
 
         # =========================
@@ -112,44 +107,44 @@ class TaxDrainScene(Scene):
 
         self.play(
             Create(axes),
-            run_time=2
+            run_time=0.8
         )
-
+                # =========================
+        # TOTAL TAX CARD
         # =========================
-        # BALANCE CURVE
-        # =========================
 
-        curve_points = [
+        total_tax = int(sum(taxes))
 
-            axes.c2p(i+1, y)
+        metric_group = VGroup(
 
-            for i, y in enumerate(
-                normalized_balances
+            Text(
+                "Total Taxes Paid",
+                font_size=16,
+                color=RED_C
+            ),
+
+            Text(
+                f"${total_tax:,}",
+                font_size=24,
+                color=RED_C
             )
-        ]
 
-        balance_curve = VMobject()
+        ).arrange(DOWN)
 
-        balance_curve.set_points_smoothly(
-            curve_points
-        )
+        metric_group.scale(0.7)
 
-        balance_curve.set_stroke(
-            BLUE_C,
-            width=4,
-            opacity=0.5
-        )
+        metric_group.to_corner(UR)
 
         self.play(
-            Create(balance_curve),
-            run_time=4
+            FadeIn(metric_group),
+            run_time=0.5
         )
 
         # =========================
-        # TAX STREAMS
+        # TAX BARS
         # =========================
 
-        tax_streams = VGroup()
+        bars = VGroup()
 
         for i in range(len(years)):
 
@@ -158,203 +153,141 @@ class TaxDrainScene(Scene):
                 0.05
             )
 
-            stream = Rectangle(
-                width=0.15,
+            bar = Rectangle(
+                width=0.22,
                 height=height,
                 fill_color=RED_C,
-                fill_opacity=0.85,
+                fill_opacity=0.9,
                 stroke_width=0
             )
 
-            glow = Rectangle(
-                width=0.15,
-                height=height,
-                fill_color=RED_C,
-                fill_opacity=0.15,
-                stroke_width=0
-            )
-
-            glow.scale(1.8)
-
-            stream.move_to(
+            bar.move_to(
                 axes.c2p(
-                    i+1,
+                    i + 1,
                     height / 2
                 )
             )
 
-            glow.move_to(
-                axes.c2p(
-                    i+1,
-                    height / 2
-                )
-            )
-
-            tax_streams.add(glow)
-            tax_streams.add(stream)
+            bars.add(bar)
 
         self.play(
+        LaggedStart(
+            *[
+                GrowFromEdge(bar, DOWN)
+                for bar in bars
+            ],
+            lag_ratio=0.03
+        ),
+        run_time=2
+    )
 
-            LaggedStart(
-                *[
-                    GrowFromEdge(
-                        stream,
-                        DOWN
-                    )
-                    for stream in tax_streams
-                ],
-                lag_ratio=0.02
+        # =========================
+        # PEAK TAX
+        # =========================
+
+        peak_index = taxes.index(
+            max(taxes)
+        )
+
+        peak_tax = int(
+            max(taxes)
+        )
+
+        peak_bar = bars[peak_index]
+
+        peak_bar.set_fill(
+            YELLOW,
+            opacity=1
+        )
+
+        peak_label = Text(
+            f"Peak Tax\n${peak_tax:,}",
+            font_size=20,
+            color=YELLOW
+        )
+
+        peak_label.next_to(
+            peak_bar,
+            UP
+        )
+
+        self.play(
+            Indicate(
+                peak_bar,
+                scale_factor=1.15
+            ),
+            FadeIn(
+                peak_label
+            ),
+            run_time=1
+        )
+                # =========================
+        # ENDING PORTFOLIO
+        # =========================
+
+        ending_balance = int(
+            balances[-1]
+        )
+
+        value_group = VGroup(
+
+            Text(
+                "Ending Portfolio",
+                font_size=16,
+                color=WHITE
             ),
 
-            run_time=5
-        )
-
-        # =========================
-        # LEAKING PARTICLES
-        # =========================
-
-        particles = VGroup()
-
-        for i in range(0, len(curve_points), 2):
-
-            particle = Dot(
-                curve_points[i],
-                radius=0.05,
-                color=RED_A
+            Text(
+                f"${ending_balance:,}",
+                font_size=24,
+                color=GREEN_C
             )
 
-            particles.add(particle)
+        ).arrange(DOWN)
+
+        value_group.scale(0.7)
+
+        value_group.to_corner(DR)
 
         self.play(
-
-            LaggedStart(
-                *[
-                    particle.animate.shift(
-                        DOWN * 2.5 +
-                        RIGHT * 0.3
-                    )
-                    for particle in particles
-                ],
-                lag_ratio=0.04
-            ),
-
-            run_time=5
-        )
-
-        # =========================
-        # YEAR DISPLAY
-        # =========================
-
-        year_text = Text(
-            str(years[0]),
-            font_size=34,
-            color=GREY_B
-        )
-
-        year_text.to_corner(UL)
-
-        self.play(
-            FadeIn(year_text)
-        )
-
-        # =========================
-        # TRACKER
-        # =========================
-
-        tracker = Dot(
-            curve_points[0],
-            radius=0.12,
-            color=WHITE
-        )
-
-        glow_tracker = Dot(
-            curve_points[0],
-            radius=0.25,
-            color=WHITE,
-            fill_opacity=0.15
-        )
-
-        self.play(
-            FadeIn(glow_tracker),
-            FadeIn(tracker)
-        )
-
-        # =========================
-        # TRACKER EVOLUTION
-        # =========================
-
-        for i in range(len(curve_points)):
-
-            year_update = Text(
-                str(years[i]),
-                font_size=34,
-                color=GREY_B
-            )
-
-            year_update.move_to(
-                year_text
-            )
-
-            if i > len(curve_points) * 0.65:
-
-                tracker_color = RED_C
-
-                glow_opacity = 0.08
-
-            else:
-
-                tracker_color = WHITE
-
-                glow_opacity = 0.15
-
-            self.play(
-
-                tracker.animate
-                .move_to(curve_points[i])
-                .set_color(tracker_color),
-
-                glow_tracker.animate
-                .move_to(curve_points[i])
-                .set_color(tracker_color)
-                .set_opacity(glow_opacity),
-
-                Transform(
-                    year_text,
-                    year_update
-                ),
-
-                run_time=0.12
-            )
-
-        # =========================
-        # TAX PULSE
-        # =========================
-
-        self.play(
-            tax_streams.animate.scale(1.05),
-            run_time=0.5
-        )
-
-        self.play(
-            tax_streams.animate.scale(0.95),
+            FadeIn(value_group),
             run_time=0.5
         )
 
         # =========================
-        # FINAL WARNING
+        # TAX DRAG SUMMARY
         # =========================
 
-        final_text = Text(
-            "Tax drag silently compounds\nacross retirement decades.",
-            font_size=28,
-            color=WHITE
+        summary_group = VGroup(
+
+            Text(
+                "Tax Drag",
+                font_size=16,
+                color=RED_C
+            ),
+
+            Text(
+                "Taxes steadily reduce\nlong-term portfolio growth.",
+                font_size=12,
+                color=GREY_A
+            )
+
+        ).arrange(
+            DOWN,
+            aligned_edge=LEFT
         )
 
-        final_text.to_edge(DOWN)
+        summary_group.scale(0.8)
+
+        summary_group.to_corner(DL)
 
         self.play(
-            Write(final_text),
-            run_time=3
+            FadeIn(summary_group),
+            run_time=0.5
         )
 
-        self.wait(4)
+        self.wait(7)
+
+        
+
+        

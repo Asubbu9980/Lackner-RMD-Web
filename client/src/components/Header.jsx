@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+
 import SummaryCards from "./SummaryCards";
 
-import { Moon, Sun, Sparkles } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 
 import { useThemeContext } from "../context/ThemeContext";
 import { useRenderMode } from "../context/RenderModeContext";
@@ -108,74 +110,73 @@ const Header = () => {
               LEFT
           ================================= */}
 
-          <div>
-            {/* TAG */}
+          {/* =================================
+    LEFT
+================================= */}
 
+          <div className="flex items-center gap-4">
+            <img
+              src="/logo.png"
+              alt="Lackner Logo"
+              className="
+      h-32
+      w-72
+
+      object-contain
+    "
+            />
             <div
               className="
-                inline-flex
-                items-center
-                gap-2
+    px-5
+    py-3
+    max-w-fit
 
-                px-3
-                py-1
+    rounded-2xl
 
-                rounded-full
+    bg-gradient-to-r
+    from-cyan-500/5
+    via-blue-500/5
+    to-purple-500/5
 
-                border
-                border-cyan-400/20
+    border
+    border-cyan-400/10
 
-                bg-cyan-400/5
-
-                mb-3
-              "
+    backdrop-blur-xl
+  "
             >
-              <Sparkles size={12} className="text-cyan-300" />
-
-              <span
+              <h1
                 className="
-                  text-[10px]
-                  uppercase
-                  tracking-[0.15em]
+      text-4xl
+      lg:text-5xl
 
-                  text-cyan-300
-                  font-semibold
-                "
+      font-black
+      tracking-tight
+
+      bg-gradient-to-r
+from-cyan-500
+via-blue-500
+to-purple-500
+
+bg-clip-text
+text-transparent]
+    "
               >
-                Financial Intelligence
-              </span>
+                Lackner Financial Intelligence
+              </h1>
+
+              <p
+                className="
+      mt-2
+
+      text-base
+
+      text-[var(--text-secondary)]
+    "
+              >
+                Interactive retirement analytics powered by Three.js and Manim
+                visualizations
+              </p>
             </div>
-
-            {/* TITLE */}
-
-            <h1
-              className="
-                text-2xl
-                lg:text-3xl
-
-                font-black
-                tracking-tight
-
-                text-[var(--text-primary)]
-              "
-            >
-              RMD Projection Workspace
-            </h1>
-
-            {/* SUBTITLE */}
-
-            <p
-              className="
-                mt-1
-
-                text-xs
-                lg:text-sm
-
-                text-[var(--text-secondary)]
-              "
-            >
-              Backend-driven wealth, tax and retirement distribution analytics
-            </p>
           </div>
 
           {/* =================================
@@ -199,8 +200,8 @@ const Header = () => {
                 items-center
                 gap-2
 
-                px-3
-                py-2
+                px-5
+                py-3
 
                 rounded-xl
 
@@ -227,7 +228,7 @@ const Header = () => {
 
               <span
                 className="
-                  text-xs
+                  text-sm
                   font-medium
 
                   text-cyan-300
@@ -258,12 +259,12 @@ const Header = () => {
               <button
                 onClick={() => setRenderMode("node")}
                 className={`
-      px-5
-      py-2.5
+      px-8
+      py-3.5
 
       rounded-xl
 
-      text-xs
+      text-sm
       font-semibold
 
       transition-all
@@ -288,18 +289,18 @@ const Header = () => {
       }
     `}
               >
-                Three D
+                3D Manim
               </button>
 
               <button
                 onClick={() => setRenderMode("python")}
                 className={`
-      px-5
-      py-2.5
+      px-8
+      py-3.5
 
       rounded-xl
 
-      text-xs
+      text-sm
       font-semibold
 
       transition-all
@@ -341,8 +342,8 @@ const Header = () => {
                 items-center
                 gap-2
 
-                px-4
-                py-2.5
+                px-6
+                py-3.5
 
                 rounded-xl
 
@@ -401,7 +402,7 @@ const Header = () => {
                   relative
                   z-10
 
-                  text-xs
+                  text-sm
                   font-semibold
 
                   text-[var(--text-primary)]
