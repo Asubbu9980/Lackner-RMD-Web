@@ -19,8 +19,8 @@ import Calculator from "./pages/Calculator";
 
 import { RenderModeProvider } from "./context/RenderModeContext";
 
-// import LandingPage from "./pages/LandingPage";
-// import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
 
 const AppContent = () => {
 
@@ -42,7 +42,7 @@ const AppContent = () => {
           <Routes>
 
            
-           {/* <Route
+            <Route
               path="/"
               element={<LandingPage />}
             />
@@ -51,11 +51,11 @@ const AppContent = () => {
             <Route
               path="/login"
               element={<LoginPage />}
-            />  */}
+            />  
 
             {/* DASHBOARD */}
             <Route
-              path="/"
+              path="/dashboard"
               element={<Calculator />}
             />
 

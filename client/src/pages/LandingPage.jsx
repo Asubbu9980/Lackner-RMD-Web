@@ -19,281 +19,164 @@ export default function LandingPage() {
           ? "linear-gradient(180deg,#020617 0%, #081229 100%)"
           : "linear-gradient(180deg,#f8fbff 0%, #eef5ff 100%)",
 
-        overflow: "hidden",
+        display: "flex",
+
+        alignItems: "center",
+
+        justifyContent: "center",
+
+        p: {
+          xs: 2,
+          md: 4,
+        },
       }}
     >
-      {/* NAVBAR */}
       <Box
         sx={{
-          px: {
-            xs: 2,
-            md: 4,
-          },
+          position: "fixed",
 
-          py: 2,
+          top: 24,
+          right: 24,
 
-          borderBottom: isDark
-            ? "1px solid rgba(255,255,255,0.06)"
-            : "1px solid rgba(15,23,42,0.08)",
+          zIndex: 9999,
+        }}
+      >
+        <button
+          onClick={toggleTheme}
+          className="
+                  group
+                  relative
+                  flex
+                  items-center
+                  gap-2
+                  px-4
+                  py-2.5
+                  rounded-xl
+                  border
+                  border-[var(--border-color)]
+                  bg-[var(--bg-secondary)]
+                  hover:bg-[var(--hover-bg)]
+                  transition-all
+                  duration-300
+                  hover:shadow-[0_0_20px_rgba(0,212,255,0.15)]
+                "
+        >
+          <div
+            className="
+                    absolute
+                    inset-0
+                    rounded-xl
+                    bg-gradient-to-r
+                    from-cyan-400/0
+                    via-cyan-400/5
+                    to-blue-500/0
+                    opacity-0
+                    group-hover:opacity-100
+                    transition-opacity
+                    duration-300
+                  "
+          />
+
+          <div className="relative z-10">
+            {isDark ? (
+              <Sun size={16} className="text-yellow-300" />
+            ) : (
+              <Moon size={16} className="text-slate-700" />
+            )}
+          </div>
+
+          <span
+            className="
+                    relative
+                    z-10
+                    text-xs
+                    font-semibold
+                    text-[var(--text-primary)]
+                  "
+          >
+            {isDark ? "Light Mode" : "Dark Mode"}
+          </span>
+        </button>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "1400px",
 
           display: "flex",
 
-          alignItems: "center",
+          flexDirection: {
+            xs: "column",
+            lg: "row",
+          },
 
-          justifyContent: "space-between",
+          borderRadius: "28px",
+          overflow: "hidden",
 
-          backdropFilter: "blur(10px)",
+          border: isDark
+            ? "1px solid rgba(255,255,255,0.06)"
+            : "1px solid rgba(15,23,42,0.08)",
 
-          position: "sticky",
-
-          top: 0,
-
-          zIndex: 50,
-
-          background: isDark ? "rgba(2,6,23,0.72)" : "rgba(255,255,255,0.72)",
+          boxShadow: isDark
+            ? "0 20px 60px rgba(0,0,0,0.45)"
+            : "0 20px 60px rgba(15,23,42,0.08)",
         }}
       >
-        {/* LOGO */}
-        <Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    gap: 2,
-  }}
->
-  <Box
-    component="img"
-    src="/logo.png"
-    alt="Lackner"
-    sx={{
-      height: 60,
-      width: 140,
-      objectFit: "contain",
-    }}
-  />
-
-  <Typography
-    variant="h5"
-    sx={{
-      fontWeight: 800,
-      background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-    Lackner Financial Intelligence
-  </Typography>
-</Box>
-
-        {/* RIGHT */}
         <Box
           sx={{
+            flex: 1,
             display: "flex",
-
             alignItems: "center",
-
-            gap: 1.5,
+            p: {
+              xs: 4,
+              md: 5,
+            },
           }}
         >
-          <Chip
-            label="Live Projection Engine"
+          <Box
             sx={{
-              display: {
-                xs: "none",
-                md: "flex",
-              },
-
-              background: isDark ? "rgba(14,165,233,0.08)" : "#e0f2fe",
-
-              color: "#06b6d4",
-
-              border: "1px solid rgba(14,165,233,0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              mb: 3,
+              flexWrap: "wrap",
             }}
-          />
-
-          {/* THEME TOGGLE */}
-          <button
-            onClick={toggleTheme}
-            className="
-                          group
-          
-                          relative
-          
-                          flex
-                          items-center
-                          gap-2
-          
-                          px-4
-                          py-2.5
-          
-                          rounded-xl
-          
-                          border
-                          border-[var(--border-color)]
-          
-                          bg-[var(--bg-secondary)]
-          
-                          hover:bg-[var(--hover-bg)]
-          
-                          transition-all
-                          duration-300
-          
-                          hover:shadow-[0_0_20px_rgba(0,212,255,0.15)]
-          
-                          hover:-translate-y-[1px]
-                        "
           >
-            {/* Glow */}
-
-            <div
-              className="
-                            absolute
-                            inset-0
-          
-                            rounded-xl
-          
-                            bg-gradient-to-r
-                            from-cyan-400/0
-                            via-cyan-400/5
-                            to-blue-500/0
-          
-                            opacity-0
-          
-                            group-hover:opacity-100
-          
-                            transition-opacity
-                            duration-300
-                          "
-            />
-
-            {/* ICON */}
-
-            <div className="relative z-10">
-              {isDark ? (
-                <Sun size={16} className="text-yellow-300" />
-              ) : (
-                <Moon size={16} className="text-slate-700" />
-              )}
-            </div>
-
-            {/* TEXT */}
-
-            <span
-              className="
-                            relative
-                            z-10
-          
-                            text-xs
-                            font-semibold
-          
-                            text-[var(--text-primary)]
-                          "
-            >
-              {isDark ? "Light Mode" : "Dark Mode"}
-            </span>
-          </button>
-
-          <Link to="/login" style={{ textDecoration: "none" }}>
-            <Button
-              variant="outlined"
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="Lackner Group"
               sx={{
-                borderRadius: "14px",
+                height: 50,
+                width: "auto",
 
-                px: 3,
-              }}
-            >
-              Login
-            </Button>
-          </Link>
-
-          <Link to="/" style={{ textDecoration: "none" }}>
-            <Button
-              variant="contained"
-              sx={{
-                borderRadius: "14px",
-
-                px: 3,
-
-                background: "linear-gradient(135deg,#38bdf8,#2563eb)",
-
-                boxShadow: "0 8px 20px rgba(14,165,233,0.25)",
-              }}
-            >
-              Workspace
-            </Button>
-          </Link>
-        </Box>
-      </Box>
-
-      {/* HERO */}
-      <Grid
-        container
-        spacing={4}
-        sx={{
-          px: {
-            xs: 2,
-            md: 5,
-          },
-
-          py: {
-            xs: 4,
-            md: 4,
-          },
-
-          alignItems: "center",
-
-          minHeight: "calc(100vh - 90px)",
-        }}
-      >
-        {/* LEFT */}
-        <Grid
-          item
-          xs={12}
-          lg={5}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ maxWidth: "540px" }}>
-            <Chip
-              label="Financial Projection Workspace"
-              sx={{
-                mb: 3,
-
-                background: isDark ? "rgba(14,165,233,0.08)" : "#e0f2fe",
-
-                color: "#06b6d4",
-
-                border: "1px solid rgba(14,165,233,0.2)",
+                filter: isDark
+                  ? "drop-shadow(0 0 12px rgba(56,189,248,0.3))"
+                  : "none",
               }}
             />
 
             <Typography
               sx={{
                 fontSize: {
-                  xs: "42px",
-                  md: "44px",
+                  xs: "32px",
+                  md: "48px",
                 },
-
-                lineHeight: 1.08,
-
-                fontWeight: 800,
-
+                fontWeight: 900,
+                letterSpacing: "-2px",
+                lineHeight: 1.02,
                 mb: 2.5,
               }}
             >
-              Cinematic Financial
-              <br />
-              Visualization
+              Retirement Calculator Reimagined
             </Typography>
 
             <Typography
               variant="body1"
               sx={{
-                fontSize: "17px",
+                fontSize: "20px",
 
-                maxWidth: "520px",
+                maxWidth: "620px",
 
                 opacity: 0.8,
 
@@ -374,10 +257,10 @@ export default function LandingPage() {
                   subtitle: "Cinematic Workflow",
                 },
               ].map((item, index) => (
-                <Grid item xs={6} key={index}>
+                <Grid item xs={12} md={4} key={index}>
                   <Card
                     sx={{
-                      p: 2.2,
+                      p: 3,
 
                       borderRadius: "18px",
 
@@ -415,10 +298,17 @@ export default function LandingPage() {
               ))}
             </Grid>
           </Box>
-        </Grid>
-
-        {/* RIGHT */}
-        <Grid item xs={12} lg={7}>
+          <Box />
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            p: {
+              xs: 3,
+              md: 5,
+            },
+          }}
+        >
           <Card
             sx={{
               p: 2.5,
@@ -433,7 +323,8 @@ export default function LandingPage() {
 
               overflow: "hidden",
 
-              maxWidth: "760px",
+              width: "100%",
+              maxWidth: "100%",
 
               mx: "auto",
 
@@ -472,14 +363,13 @@ export default function LandingPage() {
               </Box>
 
               <Chip
-                label="Three D | 3Blue1Brown"
+                label="3D Manim | 3Blue1Brown"
                 sx={{
                   background: "linear-gradient(135deg,#38bdf8,#2563eb)",
 
                   color: "#fff",
                 }}
               />
-             
             </Box>
 
             {/* SCREEN */}
@@ -651,27 +541,18 @@ export default function LandingPage() {
                 >
                   <Card
                     sx={{
-                      p: 2.2,
-
-                      borderRadius: "18px",
-
-                      boxShadow: "none",
-
+                      p: 2.5,
+                      borderRadius: "24px",
                       width: "100%",
-
-                      background: isDark ? "rgba(15,23,42,0.78)" : "#ffffff",
-
-                      border: isDark
-                        ? "1px solid rgba(255,255,255,0.05)"
-                        : "1px solid rgba(15,23,42,0.06)",
+                      height: "100%",
 
                       display: "flex",
-
                       flexDirection: "column",
-
                       justifyContent: "center",
 
-                      minHeight: "110px",
+                      background: isDark
+                        ? "linear-gradient(180deg,#0f172a,#081229)"
+                        : "#ffffff",
                     }}
                   >
                     <Typography
@@ -706,8 +587,8 @@ export default function LandingPage() {
               ))}
             </Grid>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 }

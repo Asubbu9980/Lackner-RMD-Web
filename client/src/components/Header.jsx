@@ -1,11 +1,22 @@
-/* eslint-disable no-unused-vars */
-
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Button,
+} from "@mui/material";
 import SummaryCards from "./SummaryCards";
 
 import { Moon, Sun } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import { useThemeContext } from "../context/ThemeContext";
 import { useRenderMode } from "../context/RenderModeContext";
+
+import { LogOut } from "lucide-react";
 
 const Header = () => {
   const { mode, toggleTheme } = useThemeContext();
@@ -13,6 +24,16 @@ const Header = () => {
   const { renderMode, setRenderMode } = useRenderMode();
 
   const isDark = mode === "dark";
+
+  const navigate = useNavigate();
+
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  sessionStorage.clear();
+
+  navigate("/");
+};
 
   return (
     <header
@@ -124,6 +145,11 @@ const Header = () => {
 
       object-contain
     "
+              style={{
+                filter: isDark
+                  ? "drop-shadow(0 0 12px rgba(56,189,248,0.3))"
+                  : "none",
+              }}
             />
             <div
               className="
@@ -411,6 +437,46 @@ text-transparent]
                 {isDark ? "Light Mode" : "Dark Mode"}
               </span>
             </button>
+            <button
+              onClick={() => setLogoutOpen(true)}
+              className="
+    group
+
+    flex
+    items-center
+    gap-2
+
+    px-5
+    py-3
+
+    rounded-xl
+
+    border
+    border-red-500/20
+
+    bg-red-500/5
+
+    text-red-400
+
+    hover:bg-red-500/10
+
+    transition-all
+    duration-300
+
+    hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]
+  "
+            >
+              <LogOut size={16} />
+
+              <span
+                className="
+      text-sm
+      font-semibold
+    "
+              >
+                Logout
+              </span>
+            </button>
           </div>
         </div>
 
@@ -419,6 +485,43 @@ text-transparent]
         ================================= */}
 
         <SummaryCards />
+        <Dialog
+  open={logoutOpen}
+  onClose={() => setLogoutOpen(false)}
+  PaperProps={{
+    sx: {
+      borderRadius: "20px",
+      p: 1,
+      minWidth: 350,
+    },
+  }}
+>
+  <DialogTitle>
+    Confirm Logout
+  </DialogTitle>
+
+  <DialogContent>
+    <Typography>
+      Are you sure you want to logout from the workspace?
+    </Typography>
+  </DialogContent>
+
+  <DialogActions>
+    <Button
+      onClick={() => setLogoutOpen(false)}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      color="error"
+      variant="contained"
+      onClick={handleLogout}
+    >
+      Logout
+    </Button>
+  </DialogActions>
+</Dialog>
       </div>
     </header>
   );

@@ -58,6 +58,73 @@ export default function LoginPage() {
         },
       }}
     >
+      <Box
+        sx={{
+          position: "fixed",
+
+          top: 24,
+          right: 24,
+
+          zIndex: 9999,
+        }}
+      >
+        <button
+          onClick={toggleTheme}
+          className="
+                  group
+                  relative
+                  flex
+                  items-center
+                  gap-2
+                  px-4
+                  py-2.5
+                  rounded-xl
+                  border
+                  border-[var(--border-color)]
+                  bg-[var(--bg-secondary)]
+                  hover:bg-[var(--hover-bg)]
+                  transition-all
+                  duration-300
+                  hover:shadow-[0_0_20px_rgba(0,212,255,0.15)]
+                "
+        >
+          <div
+            className="
+                    absolute
+                    inset-0
+                    rounded-xl
+                    bg-gradient-to-r
+                    from-cyan-400/0
+                    via-cyan-400/5
+                    to-blue-500/0
+                    opacity-0
+                    group-hover:opacity-100
+                    transition-opacity
+                    duration-300
+                  "
+          />
+
+          <div className="relative z-10">
+            {isDark ? (
+              <Sun size={16} className="text-yellow-300" />
+            ) : (
+              <Moon size={16} className="text-slate-700" />
+            )}
+          </div>
+
+          <span
+            className="
+                    relative
+                    z-10
+                    text-xs
+                    font-semibold
+                    text-[var(--text-primary)]
+                  "
+          >
+            {isDark ? "Light Mode" : "Dark Mode"}
+          </span>
+        </button>
+      </Box>
       <Grid
         container
         columns={12}
@@ -94,145 +161,46 @@ export default function LoginPage() {
               justifyContent: "center",
             }}
           >
-            {/* TOP */}
             <Box
+              component="img"
+              src="/logo.png"
+              alt="Lackner"
               sx={{
-                display: "flex",
-
-                justifyContent: "space-between",
-
-                alignItems: "center",
-
-                mb: 5,
-              }}
-            >
-              <Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    gap: 2,
-  }}
->
-
-
-  <Typography
-    variant="h5"
-    sx={{
-      fontWeight: 800,
-      background: "linear-gradient(90deg,#38bdf8,#0ea5e9)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-    Lackner Financial Intelligence
-  </Typography>
-</Box>
-
-              <button
-                onClick={toggleTheme}
-                className="
-                  group
-                  relative
-                  flex
-                  items-center
-                  gap-2
-                  px-4
-                  py-2.5
-                  rounded-xl
-                  border
-                  border-[var(--border-color)]
-                  bg-[var(--bg-secondary)]
-                  hover:bg-[var(--hover-bg)]
-                  transition-all
-                  duration-300
-                  hover:shadow-[0_0_20px_rgba(0,212,255,0.15)]
-                "
-              >
-                <div
-                  className="
-                    absolute
-                    inset-0
-                    rounded-xl
-                    bg-gradient-to-r
-                    from-cyan-400/0
-                    via-cyan-400/5
-                    to-blue-500/0
-                    opacity-0
-                    group-hover:opacity-100
-                    transition-opacity
-                    duration-300
-                  "
-                />
-
-                <div className="relative z-10">
-                  {isDark ? (
-                    <Sun size={16} className="text-yellow-300" />
-                  ) : (
-                    <Moon size={16} className="text-slate-700" />
-                  )}
-                </div>
-
-                <span
-                  className="
-                    relative
-                    z-10
-                    text-xs
-                    font-semibold
-                    text-[var(--text-primary)]
-                  "
-                >
-                  {isDark ? "Light Mode" : "Dark Mode"}
-                </span>
-              </button>
-            </Box>
-
-            {/* CHIP */}
-            <Chip
-              label="Secure Workspace Access"
-              sx={{
-                width: "fit-content",
-
-                mb: 3,
-
-                background: isDark ? "rgba(14,165,233,0.08)" : "#e0f2fe",
-
-                color: "#06b6d4",
-
-                border: "1px solid rgba(14,165,233,0.2)",
+                width: "160px",
+                height: "auto",
+                mb: 4,
+                filter: isDark
+                  ? "drop-shadow(0 0 12px rgba(56,189,248,0.3))"
+                  : "none",
               }}
             />
 
-            <Box
-  component="img"
-  src="/logo.png"
-  alt="Lackner"
-  sx={{
-    width: 260,
-    height: "auto",
-    mb: 4,
-  }}
-/>
-
             {/* HEADING */}
             <Typography
-              variant="h3"
               sx={{
-                fontWeight: 800,
-
-                mb: 2,
+                fontSize: {
+                  xs: "24px",
+                  md: "32px",
+                },
+                fontWeight: 900,
+                letterSpacing: "-2px",
+                lineHeight: 1.02,
+                mb: 2.5,
               }}
             >
               Welcome Back
             </Typography>
 
             <Typography
-              variant="body1"
+               variant="body1"
               sx={{
+                fontSize: "20px",
+
+                maxWidth: "620px",
+
                 opacity: 0.8,
 
-                lineHeight: 1.8,
-
-                mb: 5,
+                lineHeight: 1.4,
               }}
             >
               Access your cinematic financial projection workspace and
@@ -240,7 +208,17 @@ export default function LoginPage() {
             </Typography>
 
             {/* EMAIL */}
-            <Box sx={{ mb: 3 }}>
+            <Box
+                          sx={{
+                            display: "flex",
+            
+                            gap: 2,
+            
+                            mt: 4,
+            
+                            flexWrap: "wrap",
+                          }}
+                        >
               <Typography variant="body2" sx={{ mb: 1 }}>
                 Email Address
               </Typography>
@@ -254,7 +232,17 @@ export default function LoginPage() {
             </Box>
 
             {/* PASSWORD */}
-            <Box sx={{ mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+
+                gap: 2,
+
+                mt: 4,
+
+                flexWrap: "wrap",
+              }}
+            >
               <Typography variant="body2" sx={{ mb: 1 }}>
                 Password
               </Typography>
@@ -280,6 +268,18 @@ export default function LoginPage() {
               </Typography>
             )}
 
+            <Box
+                          sx={{
+                            display: "flex",
+            
+                            gap: 2,
+            
+                            mt: 4,
+            
+                            flexWrap: "wrap",
+                          }}
+                        >
+
             {/* BUTTON */}
             <Button
               fullWidth
@@ -300,6 +300,7 @@ export default function LoginPage() {
             >
               Log In
             </Button>
+            </Box>
 
             {/* BACK */}
             <Link
@@ -389,7 +390,7 @@ export default function LoginPage() {
               </Box>
 
               <Chip
-                label="Three D | 3Blue1Brown"
+                label="3D Manim | 3Blue1Brown"
                 sx={{
                   background: "linear-gradient(135deg,#38bdf8,#2563eb)",
 
@@ -506,14 +507,16 @@ export default function LoginPage() {
                   color: "#38bdf8",
                 },
               ].map((item, index) => (
-                <Grid item
+                <Grid
+                  item
                   xs={4}
                   key={index}
                   sx={{
                     display: "flex",
 
                     flex: 1,
-                  }}>
+                  }}
+                >
                   <Card
                     sx={{
                       p: 2.2,
@@ -539,11 +542,16 @@ export default function LoginPage() {
                       minHeight: "110px",
                     }}
                   >
-                    <Typography variant="caption" sx={{
+                    <Typography
+                      variant="caption"
+                      sx={{
                         opacity: 0.7,
 
                         fontSize: "12px",
-                      }}>{item.title}</Typography>
+                      }}
+                    >
+                      {item.title}
+                    </Typography>
 
                     <Typography
                       sx={{
