@@ -1,5 +1,6 @@
 from moviepy import VideoFileClip
 from moviepy import AudioFileClip
+from moviepy import concatenate_videoclips
 
 
 def merge_audio_video(
@@ -14,9 +15,25 @@ def merge_audio_video(
 
     if audio.duration > video.duration:
 
-        audio = audio.subclipped(
+        # Narration is longer than the rendered animation (e.g. after the
+        # end-of-scene wait() padding was trimmed in PERF-0003). Extend the
+        # video by freezing on its last frame so the full narration plays
+        # instead of being cut off. Do NOT truncate the audio here.
+        last_frame_t = max(
             0,
-            video.duration
+            video.duration - (1.0 / video.fps)
+        )
+
+        freeze = (
+            video
+            .to_ImageClip(last_frame_t)
+            .with_duration(
+                audio.duration - video.duration
+            )
+        )
+
+        video = concatenate_videoclips(
+            [video, freeze]
         )
 
     final_video = video.with_audio(audio)
@@ -24,5 +41,6 @@ def merge_audio_video(
     final_video.write_videofile(
         output_path,
         codec="libx264",
-        audio_codec="aac"
+        audio_codec="aac",
+        preset="ultrafast"
     )

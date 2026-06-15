@@ -1,10 +1,11 @@
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
 from app.models.request_models import RmdRequest
 from app.services.rmd_engine import calculate_schedule
 
 from app.services.charts import generate_chart_data
-from app.services.manim_service import render_scene
+from app.services.manim_service import start_render_job, get_job
 
 router = APIRouter()
 
@@ -86,12 +87,35 @@ def generate_cinematic(
     )
 
     # -------------------------------------
-    # RENDER CINEMATIC SCENE
+    # SUMMARY
     # -------------------------------------
 
-    video_url = render_scene(
+    summary = {
+
+        "endingBalance":
+        result["endingBalance"],
+
+        "totalRmd":
+        result["totalRmd"],
+
+        "totalTax":
+        result["totalTax"],
+
+        "totalGrowth":
+        result["totalGrowth"]
+    }
+
+    # -------------------------------------
+    # START CINEMATIC RENDER (async)
+    # -------------------------------------
+    # Rendering happens on a background thread so the client can poll
+    # /cinematic/status/{job_id} for real render progress instead of
+    # blocking on a single long request.
+
+    job_id = start_render_job(
         scene_type,
-        chart_data
+        chart_data,
+        summary,
     )
 
     # -------------------------------------
@@ -106,21 +130,41 @@ def generate_cinematic(
         "scene_type":
         scene_type,
 
-        "video_url":
-        video_url,
+        "job_id":
+        job_id,
 
-        "summary": {
+        "summary":
+        summary
+    }
 
-            "endingBalance":
-            result["endingBalance"],
 
-            "totalRmd":
-            result["totalRmd"],
+# =========================================
+# RENDER PROGRESS STATUS
+# =========================================
 
-            "totalTax":
-            result["totalTax"],
+@router.get("/cinematic/status/{job_id}")
+def cinematic_status(job_id: str):
 
-            "totalGrowth":
-            result["totalGrowth"]
-        }
+    job = get_job(job_id)
+
+    if job is None:
+
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Job not found"},
+        )
+
+    return {
+
+        "status": job["status"],
+
+        "progress": job["progress"],
+
+        "stage": job["stage"],
+
+        "video_url": job["video_url"],
+
+        "summary": job["summary"],
+
+        "error": job["error"],
     }

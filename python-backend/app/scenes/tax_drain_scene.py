@@ -176,7 +176,7 @@ class TaxDrainScene(Scene):
                 GrowFromEdge(bar, DOWN)
                 for bar in bars
             ],
-            lag_ratio=0.03
+            lag_ratio=0.015
         ),
         run_time=2
     )
@@ -286,7 +286,7 @@ class TaxDrainScene(Scene):
             run_time=0.5
         )
 
-        self.wait(7)
+        self.wait(1)
 
         
 

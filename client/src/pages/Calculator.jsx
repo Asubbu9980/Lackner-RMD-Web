@@ -40,6 +40,10 @@ const Calculator = () => {
 
   const [isRendering, setIsRendering] = useState(false);
 
+  const [renderProgress, setRenderProgress] = useState(0);
+
+  const [renderStage, setRenderStage] = useState("");
+
   const [sceneDialogOpen, setSceneDialogOpen] = useState(false);
 
   const [sceneType, setSceneType] = useState("projection");
@@ -65,6 +69,8 @@ const Calculator = () => {
         return;
       }
       setIsRendering(true);
+      setRenderProgress(0);
+      setRenderStage("Starting render...");
 
       const payload = {
         balance_Start: Number(inputs.balance_Start),
@@ -89,10 +95,14 @@ const Calculator = () => {
         inputs.scenario,
         payload,
         selectedScene,
+        ({ progress, stage }) => {
+          setRenderProgress(progress);
+          setRenderStage(stage);
+        },
       );
 
-      //const fullVideoUrl = `http://localhost:8000${response.video_url}`;
-      const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
+      const fullVideoUrl = `http://localhost:8000${response.video_url}`;
+      // const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
 
       setVideoUrl(fullVideoUrl);
 
@@ -134,7 +144,7 @@ const Calculator = () => {
 
           rounded-full
 
-          bg-cyan-500/10
+          bg-purple-500/10
 
           blur-3xl
 
@@ -202,7 +212,7 @@ const Calculator = () => {
             className="
               grid
 
-              md:grid-cols-[300px_minmax(0,1fr)]
+              md:grid-cols-[380px_minmax(0,1fr)]
 
               gap-4
               xl:gap-5
@@ -270,10 +280,10 @@ const Calculator = () => {
                         justify-center
 
                         bg-gradient-to-br
-                        from-cyan-400
-                        to-blue-600
+                        from-purple-400
+                        to-indigo-600
 
-                        shadow-[0_0_25px_rgba(0,212,255,0.25)]
+                        shadow-[0_0_25px_rgba(168,85,247,0.25)]
                       "
                     >
                       <Activity size={18} className="text-white" />
@@ -349,12 +359,12 @@ const Calculator = () => {
         rounded-xl
 
         bg-gradient-to-r
-            from-cyan-400
-            to-blue-500
+            from-purple-400
+            to-indigo-500
 
             text-white
 
-            shadow-[0_0_20px_rgba(0,212,255,0.35)]
+            shadow-[0_0_20px_rgba(168,85,247,0.35)]
           `
           : `
             text-[var(--text-secondary)]
@@ -381,36 +391,109 @@ const Calculator = () => {
           items-center
           justify-center
 
+          px-10
+
           bg-black/90
           backdrop-blur-md
         "
                         >
+                          {/* PERCENT RING */}
+                          <div className="relative w-24 h-24">
+                            <svg
+                              className="w-24 h-24 -rotate-90"
+                              viewBox="0 0 100 100"
+                            >
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="42"
+                                fill="none"
+                                strokeWidth="8"
+                                className="stroke-purple-500/20"
+                              />
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="42"
+                                fill="none"
+                                strokeWidth="8"
+                                strokeLinecap="round"
+                                className="stroke-purple-400"
+                                style={{
+                                  strokeDasharray: 2 * Math.PI * 42,
+                                  strokeDashoffset:
+                                    2 *
+                                    Math.PI *
+                                    42 *
+                                    (1 - renderProgress / 100),
+                                  transition:
+                                    "stroke-dashoffset 0.4s ease",
+                                }}
+                              />
+                            </svg>
+
+                            <div
+                              className="
+                                absolute
+                                inset-0
+
+                                flex
+                                items-center
+                                justify-center
+
+                                text-white
+                                text-xl
+                                font-bold
+                              "
+                            >
+                              {Math.round(renderProgress)}%
+                            </div>
+                          </div>
+
+                          {/* LINEAR BAR */}
                           <div
                             className="
-            w-16
-            h-16
+                              mt-6
+                              w-full
+                              max-w-xs
 
-            rounded-full
+                              h-2
 
-            border-4
-            border-cyan-400
-            border-t-transparent
+                              rounded-full
 
-            animate-spin
-          "
-                          />
+                              bg-purple-500/15
+
+                              overflow-hidden
+                            "
+                          >
+                            <div
+                              className="
+                                h-full
+
+                                rounded-full
+
+                                bg-gradient-to-r
+                                from-purple-400
+                                to-indigo-400
+                              "
+                              style={{
+                                width: `${renderProgress}%`,
+                                transition: "width 0.4s ease",
+                              }}
+                            />
+                          </div>
 
                           <p
                             className="
-            mt-6
+            mt-4
 
-            text-cyan-300
+            text-purple-300
 
-            text-lg
+            text-sm
             font-semibold
           "
                           >
-                            Rendering Manim Analytics...
+                            {renderStage || "Rendering Manim Analytics..."}
                           </p>
                         </div>
                       )}

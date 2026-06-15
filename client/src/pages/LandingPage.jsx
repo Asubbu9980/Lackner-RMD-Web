@@ -4,6 +4,7 @@ import { Box, Typography, Button, Grid, Card, Chip } from "@mui/material";
 
 import { useThemeContext } from "../context/ThemeContext";
 import { Moon, Sun } from "lucide-react";
+import HeroFinancialGraph from "../components/HeroFinancialGraph";
 
 export default function LandingPage() {
   const { mode, toggleTheme } = useThemeContext();
@@ -143,18 +144,36 @@ export default function LandingPage() {
             }}
           >
             <Box
-              component="img"
-              src="/logo.png"
-              alt="Lackner Group"
               sx={{
-                height: 50,
-                width: "auto",
-
-                filter: isDark
-                  ? "drop-shadow(0 0 12px rgba(56,189,248,0.3))"
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                px: 2,
+                py: 1.25,
+                borderRadius: "16px",
+                transition: "all 0.3s ease",
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(255,255,255,0.97), rgba(241,245,249,0.92))"
+                  : "transparent",
+                border: isDark
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid transparent",
+                boxShadow: isDark
+                  ? "0 8px 24px rgba(0,0,0,0.35), 0 0 24px rgba(56,189,248,0.18)"
                   : "none",
               }}
-            />
+            >
+              <Box
+                component="img"
+                src="/LeimbergLeClairLackner_logo.png"
+                alt="Lackner Group"
+                sx={{
+                  height: 50,
+                  width: "auto",
+                  display: "block",
+                }}
+              />
+            </Box>
 
             <Typography
               sx={{
@@ -200,7 +219,7 @@ export default function LandingPage() {
                 flexWrap: "wrap",
               }}
             >
-              <Link to="/login" style={{ textDecoration: "none" }}>
+              <Link to="/dashboard" style={{ textDecoration: "none" }}>
                 <Button
                   variant="contained"
                   size="large"
@@ -216,26 +235,7 @@ export default function LandingPage() {
                     boxShadow: "0 8px 20px rgba(14,165,233,0.25)",
                   }}
                 >
-                  Login to Dashboard
-                </Button>
-              </Link>
-              <Link to="/" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    borderRadius: "16px",
-
-                    px: 4,
-
-                    py: 1.5,
-
-                    background: "linear-gradient(135deg,#38bdf8,#2563eb)",
-
-                    boxShadow: "0 8px 20px rgba(14,165,233,0.25)",
-                  }}
-                >
-                  Open Workspace
+                  Open RMD Workspace
                 </Button>
               </Link>
             </Box>
@@ -435,69 +435,15 @@ export default function LandingPage() {
               />
 
               {/* GRAPH */}
-              <svg
-                viewBox="0 0 700 300"
-                style={{
-                  width: "100%",
-
-                  height: "100%",
-
-                  position: "relative",
-
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
                   zIndex: 2,
                 }}
               >
-                <defs>
-                  <linearGradient id="curve" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#22d3ee" />
-
-                    <stop offset="50%" stopColor="#60a5fa" />
-
-                    <stop offset="100%" stopColor="#ef4444" />
-                  </linearGradient>
-                </defs>
-
-                {/* AREA */}
-                <path
-                  d="M40 250 C160 180 240 80 340 110 C430 135 510 230 650 90 L650 300 L40 300 Z"
-                  fill="rgba(56,189,248,0.08)"
-                />
-
-                {/* MAIN CURVE */}
-                <path
-                  d="M40 250 C160 180 240 80 340 110 C430 135 510 230 650 90"
-                  stroke="url(#curve)"
-                  strokeWidth="5"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-
-                {/* GLOW */}
-                <path
-                  d="M40 250 C160 180 240 80 340 110 C430 135 510 230 650 90"
-                  stroke="rgba(56,189,248,0.35)"
-                  strokeWidth="14"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-
-                {/* POINTS */}
-                {[
-                  [40, 250],
-                  [180, 150],
-                  [340, 110],
-                  [500, 210],
-                  [650, 90],
-                ].map((point, index) => (
-                  <circle
-                    key={index}
-                    cx={point[0]}
-                    cy={point[1]}
-                    r="5"
-                    fill="#ffffff"
-                  />
-                ))}
-              </svg>
+                <HeroFinancialGraph />
+              </Box>
             </Box>
 
             {/* STATS */}

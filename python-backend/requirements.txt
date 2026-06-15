@@ -9,3 +9,4 @@ python-multipart==0.0.9
 manim==0.18.1
 edge-tts==7.2.8
 moviepy==2.2.1
+pytest==8.3.3

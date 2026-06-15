@@ -31,13 +31,13 @@ const cards = (
     icon: Wallet,
 
     glow:
-      "from-cyan-400/20 to-blue-500/10",
+      "from-purple-400/20 to-indigo-500/10",
 
     border:
-      "border-cyan-400/15",
+      "border-purple-400/15",
 
     iconColor:
-      "text-cyan-300",
+      "text-purple-300",
   },
 
   {
@@ -306,9 +306,9 @@ const SummaryCards = () => {
 
                     rounded-full
 
-                    bg-cyan-300
+                    bg-purple-300
 
-                    shadow-[0_0_14px_rgba(34,211,238,0.8)]
+                    shadow-[0_0_14px_rgba(168,85,247,0.8)]
                   "
                 />
               </div>

@@ -491,7 +491,7 @@ class RmdGrowthScene(Scene):
                     for bar in growth_bars
                 ],
 
-                lag_ratio=0.01
+                lag_ratio=0.005
             ),
 
             run_time=0.8
@@ -510,7 +510,7 @@ class RmdGrowthScene(Scene):
                     for bar in rmd_bars
                 ],
 
-                lag_ratio=0.01
+                lag_ratio=0.005
             ),
 
             run_time=0.8
@@ -529,7 +529,7 @@ class RmdGrowthScene(Scene):
                     for bar in tax_bars
                 ],
 
-                lag_ratio=0.01
+                lag_ratio=0.005
             ),
 
             run_time=0.8
@@ -555,7 +555,7 @@ class RmdGrowthScene(Scene):
                 path
             ),
 
-            run_time=2.5,
+            run_time=1.5,
 
             rate_func=linear
         )
@@ -654,4 +654,4 @@ class RmdGrowthScene(Scene):
         # FINAL HOLD
         # ======================================================
 
-        self.wait(3)
+        self.wait(1)

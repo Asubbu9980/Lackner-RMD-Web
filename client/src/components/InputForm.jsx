@@ -140,11 +140,11 @@ const InputForm = ({
     transition-all
     duration-300
 
-    focus:border-cyan-400
+    focus:border-purple-400
     focus:ring-4
-    focus:ring-cyan-400/10
+    focus:ring-purple-400/10
 
-    hover:border-cyan-400/30
+    hover:border-purple-400/30
   `;
 
   return (
@@ -165,7 +165,7 @@ const InputForm = ({
 
         shadow-[0_20px_60px_rgba(0,0,0,0.18)]
 
-        p-6
+        p-5
 
         transition-colors
         duration-300
@@ -186,7 +186,7 @@ const InputForm = ({
 
           rounded-full
 
-          bg-cyan-500/10
+          bg-purple-500/10
 
           blur-3xl
 
@@ -222,17 +222,17 @@ const InputForm = ({
 
               rounded-full
 
-              bg-cyan-400/10
+              bg-purple-400/10
 
               border
-              border-cyan-400/20
+              border-purple-400/20
 
               mb-3
             "
           >
             <Sparkles
               size={14}
-              className="text-cyan-300"
+              className="text-purple-300"
             />
 
             <span
@@ -241,7 +241,7 @@ const InputForm = ({
                 uppercase
                 tracking-[0.18em]
 
-                text-cyan-300
+                text-purple-300
                 font-semibold
               "
             >
@@ -289,10 +289,10 @@ const InputForm = ({
             rounded-2xl
 
             bg-gradient-to-br
-            from-cyan-400
-            to-blue-600
+            from-purple-400
+            to-indigo-600
 
-            shadow-[0_0_30px_rgba(0,212,255,0.3)]
+            shadow-[0_0_30px_rgba(168,85,247,0.3)]
           "
         >
           <Calculator
@@ -608,7 +608,7 @@ const InputForm = ({
           >
             <SlidersHorizontal
               size={16}
-              className="text-cyan-300"
+              className="text-purple-300"
             />
 
             <h4
@@ -661,13 +661,13 @@ const InputForm = ({
                       inputs.scenario ===
                       s.id
                         ? `
-                          border-cyan-400/30
+                          border-purple-400/30
 
                           bg-gradient-to-r
-                          from-cyan-500/15
-                          to-blue-500/10
+                          from-purple-500/15
+                          to-indigo-500/10
 
-                          shadow-[0_0_25px_rgba(0,212,255,0.12)]
+                          shadow-[0_0_25px_rgba(168,85,247,0.12)]
 
                           text-white
                         `
@@ -678,7 +678,7 @@ const InputForm = ({
 
                           text-[var(--text-secondary)]
 
-                          hover:border-cyan-400/20
+                          hover:border-purple-400/20
                           hover:bg-[var(--hover-bg)]
                         `
                     }
@@ -705,7 +705,7 @@ const InputForm = ({
                       <CheckCircle2
                         size={18}
                         className="
-                          text-cyan-300
+                          text-purple-300
                         "
                       />
                     )}
@@ -822,7 +822,7 @@ const InputForm = ({
                       )
                     }
                     className="
-                      accent-cyan-500
+                      accent-purple-500
                       w-4
                       h-4
                     "
@@ -870,20 +870,20 @@ const InputForm = ({
               rounded-2xl
 
               bg-gradient-to-r
-              from-cyan-500
-              to-blue-600
+              from-purple-500
+              to-indigo-600
 
               text-white
               text-sm
               font-semibold
 
-              shadow-[0_0_30px_rgba(0,212,255,0.25)]
+              shadow-[0_0_30px_rgba(168,85,247,0.25)]
 
               transition-all
               duration-300
 
               hover:-translate-y-[1px]
-              hover:scale-[1.01]
+              hover:scale-[1.02]
             "
           >
             <Calculator

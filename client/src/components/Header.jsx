@@ -68,7 +68,7 @@ const Header = () => {
 
           rounded-full
 
-          bg-cyan-500/10
+          bg-purple-500/10
 
           blur-3xl
 
@@ -104,10 +104,10 @@ const Header = () => {
           relative
           z-10
 
-          px-4
-          lg:px-6
+          px-3
+          lg:px-5
 
-          py-4
+          py-3
         "
       >
         {/* =================================
@@ -136,21 +136,43 @@ const Header = () => {
 ================================= */}
 
           <div className="flex items-center gap-4">
-            <img
-              src="/logo.png"
-              alt="Lackner Logo"
+            <div
               className="
-      h-32
-      w-72
+      flex
+      items-center
+      justify-center
 
-      object-contain
+      rounded-2xl
+
+      px-5
+      py-3
+
+      transition-all
+      duration-300
     "
               style={{
-                filter: isDark
-                  ? "drop-shadow(0 0 12px rgba(56,189,248,0.3))"
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(255,255,255,0.97), rgba(241,245,249,0.92))"
+                  : "transparent",
+                border: isDark
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid transparent",
+                boxShadow: isDark
+                  ? "0 8px 24px rgba(0,0,0,0.35), 0 0 24px rgba(168,85,247,0.18)"
                   : "none",
               }}
-            />
+            >
+              <img
+                src="/LeimbergLeClairLackner_logo.png"
+                alt="Lackner Logo"
+                className="
+        h-24
+        w-64
+
+        object-contain
+      "
+              />
+            </div>
             <div
               className="
     px-5
@@ -300,8 +322,8 @@ text-transparent]
         renderMode === "node"
           ? `
             bg-gradient-to-r
-            from-cyan-400
-            to-blue-500
+            from-purple-400
+            to-indigo-500
 
             text-white
 
@@ -336,8 +358,8 @@ text-transparent]
         renderMode === "python"
           ? `
             bg-gradient-to-r
-            from-cyan-400
-            to-blue-500
+            from-purple-400
+            to-indigo-500
 
             text-white
 

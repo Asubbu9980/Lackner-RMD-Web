@@ -15,6 +15,7 @@ import { Sun, Moon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useThemeContext } from "../context/ThemeContext";
+import HeroFinancialGraph from "../components/HeroFinancialGraph";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -432,6 +433,22 @@ export default function LoginPage() {
                 position: "relative",
               }}
             >
+              {/* GRID OVERLAY */}
+              <Box
+                sx={{
+                  position: "absolute",
+
+                  inset: 0,
+
+                  opacity: 0.12,
+
+                  backgroundImage:
+                    "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
+
+                  backgroundSize: "40px 40px",
+                }}
+              />
+
               {/* STARS */}
               <Box
                 sx={{
@@ -447,36 +464,15 @@ export default function LoginPage() {
               />
 
               {/* GRAPH */}
-              <svg
-                viewBox="0 0 900 300"
-                style={{
+              <Box
+                sx={{
                   position: "absolute",
-
                   inset: 0,
-
-                  width: "100%",
-
-                  height: "calc(100% - 10px)",
+                  zIndex: 2,
                 }}
               >
-                <defs>
-                  <linearGradient id="curve2" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#22d3ee" />
-
-                    <stop offset="50%" stopColor="#60a5fa" />
-
-                    <stop offset="100%" stopColor="#ef4444" />
-                  </linearGradient>
-                </defs>
-
-                <path
-                  d="M40 250 C180 180 280 70 420 120 C560 170 700 240 860 90"
-                  stroke="url(#curve2)"
-                  strokeWidth="5"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-              </svg>
+                <HeroFinancialGraph />
+              </Box>
             </Box>
 
             {/* STATS */}
