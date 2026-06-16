@@ -1,5 +1,5 @@
-const API_BASE = "http://localhost:8000";
-// const API_BASE = "https://python-backend-rmd.onrender.com";
+//const API_BASE = "http://localhost:8000";
+const API_BASE = "https://python-backend-rmd.onrender.com";
 
 // Start a cinematic render. Returns { job_id, summary, ... } immediately;
 // the actual render runs on the backend and is tracked via job status.
