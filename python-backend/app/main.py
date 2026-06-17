@@ -24,7 +24,7 @@ app.add_middleware(
 
     allow_origins=[
 
-        "https://your-vercel-app.vercel.app",
+        "https://lackner-rmd-vercel.app",
 
         "http://localhost:3000"
 
