@@ -1,4 +1,4 @@
-const API_BASE = "http://44.202.179.157:8000";
+const API_BASE = "https://lackner-rmd.vercel.app/api";
 // const API_BASE = "https://python-backend-rmd.onrender.com";
 
 // Start a cinematic render. Returns { job_id, summary, ... } immediately;

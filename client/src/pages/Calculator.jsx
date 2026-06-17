@@ -101,7 +101,7 @@ const Calculator = () => {
         },
       );
 
-     const fullVideoUrl = `http://44.202.179.157:8000${response.video_url}`;
+     const fullVideoUrl = `https://lackner-rmd.vercel.app/api${response.video_url}`;
       // const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
 
       setVideoUrl(fullVideoUrl);
