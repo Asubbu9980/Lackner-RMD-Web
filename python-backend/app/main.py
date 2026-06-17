@@ -19,15 +19,25 @@ app = FastAPI(
 # )
 
 app.add_middleware(
+
     CORSMiddleware,
+
     allow_origins=[
-        "https://lackner-rmd.vercel.app",
+
+        "https://your-vercel-app.vercel.app",
+
         "http://localhost:3000"
+
     ],
+
     allow_credentials=False,
+
     allow_methods=["*"],
+
     allow_headers=["*"],
+
 )
+ 
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(__file__)
