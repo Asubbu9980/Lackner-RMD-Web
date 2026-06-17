@@ -52,7 +52,7 @@ class ErrorBoundary extends React.Component {
             }}
           >
             Visualization Temporarily
-            Unavailable
+            Unavailable due to an Error
           </h2>
 
           <p
