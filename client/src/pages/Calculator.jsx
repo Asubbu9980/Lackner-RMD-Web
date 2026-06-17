@@ -9,6 +9,8 @@ import WaterfallChart from "../components/WaterfallChart";
 import AdvancedChart from "../components/AdvancedChart";
 import DataTable from "../components/DataTable";
 
+import ErrorBoundary from "../components/ErrorBoundary";
+
 import {
   Dialog,
   DialogTitle,
@@ -321,7 +323,9 @@ const Calculator = () => {
                   {/* CHART */}
 
                   {renderMode === "node" ? (
-                    <AdvancedChart />
+                    <ErrorBoundary>
+                      <AdvancedChart />
+                   </ErrorBoundary>
                   ) : (
                     <div
                       className="
