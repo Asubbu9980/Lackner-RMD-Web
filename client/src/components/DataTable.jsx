@@ -380,6 +380,7 @@ const DataTable = () => {
                           "var(--text-primary)",
 
                         fontWeight: 700,
+                        textAlign: "left",
                       }}
                     >
                       {r.year}
@@ -399,6 +400,7 @@ const DataTable = () => {
                           "var(--text-primary)",
 
                         fontWeight: 600,
+                        textAlign: "left",
                       }}
                     >
                       {r.age}
@@ -418,7 +420,7 @@ const DataTable = () => {
                           "#8b5cf6",
 
                         fontWeight: 700,
-
+                        textAlign: "left",
                         fontVariantNumeric:
                           "tabular-nums",
                       }}
@@ -442,6 +444,7 @@ const DataTable = () => {
                           "#ef4444",
 
                         fontWeight: 700,
+                        textAlign: "left",
 
                         fontVariantNumeric:
                           "tabular-nums",
@@ -469,6 +472,7 @@ const DataTable = () => {
 
                         fontVariantNumeric:
                           "tabular-nums",
+                        textAlign: "left",
                       }}
                     >
                       {formatCurrency(

@@ -195,7 +195,7 @@ bg-clip-text
 text-transparent]
     "
               >
-                Lackner Financial Intelligence
+                Leimberg Financial Intelligence
               </h1>
 
               <p

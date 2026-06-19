@@ -81,20 +81,8 @@ function drawChart(ctx, animT, data, maxVal, hoveredIndex) {
     const yTax = getY(rmdVal + taxVal);
     const yGrowth = getY(rmdVal + taxVal + growthVal);
  
-    // 1. RMD
-    const rmdGrad = ctx.createLinearGradient(0, yRmd, 0, chartB);
-    rmdGrad.addColorStop(0, i === hoveredIndex ? "#a855f7" : "rgba(168, 85, 247, 0.7)");
-    rmdGrad.addColorStop(1, "rgba(168, 85, 247, 0.1)");
-    ctx.fillStyle = rmdGrad;
-    ctx.fillRect(x - barW/2, yRmd, barW, chartB - yRmd);
- 
-    // 2. TAX
-    const taxGrad = ctx.createLinearGradient(0, yTax, 0, yRmd);
-    taxGrad.addColorStop(0, i === hoveredIndex ? "#f43f5e" : "rgba(244, 63, 94, 0.7)");
-    taxGrad.addColorStop(1, "rgba(244, 63, 94, 0.2)");
-    ctx.fillStyle = taxGrad;
-    ctx.fillRect(x - barW/2, yTax, barW, yRmd - yTax);
- 
+    
+
     // 3. GROWTH
     if (growthVal > 0) {
       const growthGrad = ctx.createLinearGradient(0, yGrowth, 0, yTax);
@@ -103,6 +91,20 @@ function drawChart(ctx, animT, data, maxVal, hoveredIndex) {
       ctx.fillStyle = growthGrad;
       ctx.fillRect(x - barW/2, yGrowth, barW, yTax - yGrowth);
     }
+ 
+    // 2. TAX
+    const taxGrad = ctx.createLinearGradient(0, yTax, 0, yRmd);
+    taxGrad.addColorStop(0, i === hoveredIndex ? "#f43f5e" : "rgba(244, 63, 94, 0.7)");
+    taxGrad.addColorStop(1, "rgba(244, 63, 94, 0.2)");
+    ctx.fillStyle = taxGrad;
+    ctx.fillRect(x - barW/2, yTax, barW, yRmd - yTax);
+ 
+    // 1. RMD
+    const rmdGrad = ctx.createLinearGradient(0, yRmd, 0, chartB);
+    rmdGrad.addColorStop(0, i === hoveredIndex ? "#a855f7" : "rgba(168, 85, 247, 0.7)");
+    rmdGrad.addColorStop(1, "rgba(168, 85, 247, 0.1)");
+    ctx.fillStyle = rmdGrad;
+    ctx.fillRect(x - barW/2, yRmd, barW, chartB - yRmd);
  
     ctx.fillStyle = i === hoveredIndex ? "#fff" : "rgba(255,255,255,0.4)";
     ctx.fillRect(x - barW/2, yGrowth, barW, 2);
@@ -218,16 +220,19 @@ export default function GlobalAnalytics() {
         {/* Legend Overlay */}
         <div style={{ position: "absolute", top: 30, right: 40, zIndex: 10, display: "flex", gap: "20px" }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: 12, height: 12, background: '#a855f7', borderRadius: '2px' }} />
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800 }}>RMD</span>
+              <div style={{ width: 12, height: 12, background: '#10b981', borderRadius: '2px' }} />
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800 }}>GROWTH</span>
            </div>
+
            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: 12, height: 12, background: '#f43f5e', borderRadius: '2px' }} />
               <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800 }}>TAX</span>
            </div>
+           
+
            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: 12, height: 12, background: '#10b981', borderRadius: '2px' }} />
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800 }}>GROWTH</span>
+              <div style={{ width: 12, height: 12, background: '#a855f7', borderRadius: '2px' }} />
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800 }}>RMD</span>
            </div>
         </div>
  
@@ -254,10 +259,12 @@ export default function GlobalAnalytics() {
              
              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#a855f7', boxShadow: '0 0 8px #a855f7' }} />
-                   <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7 }}>RMD</span>
+                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+                   <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7 }}>GROWTH</span>
                 </div>
-                <span style={{ fontSize: '15px', fontWeight: 800 }}><AnimatedValue value={rawData[hoveredIndex].rmd} /></span>
+                <span style={{ fontSize: '15px', fontWeight: 800, color: '#10b981' }}>
+                  <AnimatedValue value={rawData[hoveredIndex].growth ?? 0} />
+                </span>
              </div>
  
              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -267,16 +274,16 @@ export default function GlobalAnalytics() {
                 </div>
                 <span style={{ fontSize: '15px', fontWeight: 800, color: '#f43f5e' }}><AnimatedValue value={rawData[hoveredIndex].tax} /></span>
              </div>
- 
-             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-                   <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7 }}>GROWTH</span>
+                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#a855f7', boxShadow: '0 0 8px #a855f7' }} />
+                   <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7 }}>RMD</span>
                 </div>
-                <span style={{ fontSize: '15px', fontWeight: 800, color: '#10b981' }}>
-                  <AnimatedValue value={rawData[hoveredIndex].growth ?? 0} />
-                </span>
+                <span style={{ fontSize: '15px', fontWeight: 800 }}><AnimatedValue value={rawData[hoveredIndex].rmd} /></span>
              </div>
+ 
+             
           </div>
         )}
       </Box>

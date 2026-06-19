@@ -171,30 +171,30 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
                           Age {d.age}
                         </Typography>
 
-                        {/* RMD */}
+                        {/* GROWTH */}
 
                         <Box
                           sx={{
                             display: "flex",
 
                             justifyContent: "space-between",
-
                             mb: 1,
                           }}
                         >
                           <Typography
                             sx={{
-                              color: "#a855f7",
+                              color: "#10b981",
                             }}
                           >
-                            RMD
+                            GROWTH
                           </Typography>
 
                           <Typography fontWeight={700}>
-                            {formatCurrency(d.rmd)}
+                            {formatCurrency(d.growth)}
                           </Typography>
                         </Box>
 
+                        
                         {/* TAX */}
 
                         <Box
@@ -219,27 +219,32 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
                           </Typography>
                         </Box>
 
-                        {/* GROWTH */}
+                        {/* RMD */}
 
                         <Box
                           sx={{
                             display: "flex",
 
                             justifyContent: "space-between",
+
+                            mb: 1,
                           }}
                         >
                           <Typography
                             sx={{
-                              color: "#10b981",
+                              color: "#a855f7",
                             }}
                           >
-                            GROWTH
+                            RMD
                           </Typography>
 
                           <Typography fontWeight={700}>
-                            {formatCurrency(d.growth)}
+                            {formatCurrency(d.rmd)}
                           </Typography>
                         </Box>
+
+
+                        
                       </Box>
                     );
                   }
@@ -251,8 +256,7 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
               {/* LEGEND */}
 
               <Legend />
-
-              {/* RMD */}
+               {/* RMD */}
 
               <Bar
                 dataKey="rmd"
@@ -260,6 +264,8 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
                 fill="#a855f7"
                 radius={[4, 4, 0, 0]}
               />
+
+              
 
               {/* TAX */}
 
@@ -269,6 +275,7 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
                 fill="#f43f5e"
                 radius={[4, 4, 0, 0]}
               />
+             
 
               {/* GROWTH */}
 
@@ -278,6 +285,8 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
                 fill="#10b981"
                 radius={[4, 4, 0, 0]}
               />
+
+              
 
               {/* TREND LINE */}
 
