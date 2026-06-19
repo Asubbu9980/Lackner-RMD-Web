@@ -178,42 +178,6 @@ const WaterfallChart = () => {
           <PlotlyChart
             data={[
               {
-                x: rows.map((r) => r.growth),
-
-                y: rows.map((r) => `${r.year}`),
-
-                type: "bar",
-
-                orientation: "h",
-
-                name: "Growth",
-
-                marker: {
-                  color: "#86efac",
-                },
-
-                customdata: rows.map((r) => [
-                  r.beginBalance,
-                  r.rmd,
-                  r.tax,
-                  r.growth,
-                  r.endBalance,
-                ]),
-
-                hovertemplate:
-                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
-                  "Financial Projection" +
-                  "</span><br><br>" +
-                  "<b>Year:</b> %{y}<br>" +
-                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
-                  "<extra></extra>",
-              },
-
-              {
                 x: rows.map((r) => r.beginBalance),
 
                 y: rows.map((r) => `${r.year}`),
@@ -225,7 +189,7 @@ const WaterfallChart = () => {
                 name: "Principal",
 
                 marker: {
-                  color: "#65a30d",
+                  color: "rgba(101,163,13,0.15)",
                 },
 
                 customdata: rows.map((r) => [
@@ -242,10 +206,49 @@ const WaterfallChart = () => {
                   "</span><br><br>" +
                   "<b>Year:</b> %{y}<br>" +
                   "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "🟩 Principal: %{customdata[0]:$,.0f}<br>" +
+                  "🟢 Growth: %{customdata[3]:$,.0f}<br>" +
+                  "🟣 RMD: %{customdata[1]:$,.0f}<br>" +
+                  "🔴 Tax: %{customdata[2]:$,.0f}" +
+                  "<extra></extra>",
+              },
+              {
+                x: rows.map((r) => r.growth),
+
+                y: rows.map((r) => `${r.year}`),
+
+                type: "bar",
+
+                orientation: "h",
+
+                name: "Growth",
+
+                marker: {
+                  color: "#22c55e",
+                  line: {
+                    color: "#16a34a",
+                    width: 1,
+                  },
+                },
+
+                customdata: rows.map((r) => [
+                  r.beginBalance,
+                  r.rmd,
+                  r.tax,
+                  r.growth,
+                  r.endBalance,
+                ]),
+
+                hovertemplate:
+                  "<span style='font-size:16px;font-weight:700;color:#38bdf8'>" +
+                  "Financial Projection" +
+                  "</span><br><br>" +
+                  "<b>Year:</b> %{y}<br>" +
+                  "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
+                  "🟩 Principal: %{customdata[0]:$,.0f}<br>" +
+                  "🟢 Growth: %{customdata[3]:$,.0f}<br>" +
+                  "🟣 RMD: %{customdata[1]:$,.0f}<br>" +
+                  "🔴 Tax: %{customdata[2]:$,.0f}" +
                   "<extra></extra>",
               },
 
@@ -278,10 +281,10 @@ const WaterfallChart = () => {
                   "</span><br><br>" +
                   "<b>Year:</b> %{y}<br>" +
                   "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "🟩 Principal: %{customdata[0]:$,.0f}<br>" +
+                  "🟢 Growth: %{customdata[3]:$,.0f}<br>" +
+                  "🟣 RMD: %{customdata[1]:$,.0f}<br>" +
+                  "🔴 Tax: %{customdata[2]:$,.0f}" +
                   "<extra></extra>",
               },
 
@@ -314,10 +317,10 @@ const WaterfallChart = () => {
                   "</span><br><br>" +
                   "<b>Year:</b> %{y}<br>" +
                   "<b>End Balance:</b> %{customdata[4]:$,.0f}<br><br>" +
-                  "<span style='color:#84cc16'><b>Principal:</b></span> %{customdata[0]:$,.0f}<br>" +
-                  "<span style='color:#22c55e'><b>Growth:</b></span> %{customdata[3]:$,.0f}<br>" +
-                  "<span style='color:#ef4444'><b>Tax:</b></span> %{customdata[2]:$,.0f}<br>" +
-                  "<span style='color:#a855f7'><b>RMD:</b></span> %{customdata[1]:$,.0f}" +
+                  "🟩 Principal: %{customdata[0]:$,.0f}<br>" +
+                  "🟢 Growth: %{customdata[3]:$,.0f}<br>" +
+                  "🟣 RMD: %{customdata[1]:$,.0f}<br>" +
+                  "🔴 Tax: %{customdata[2]:$,.0f}" +
                   "<extra></extra>",
               },
             ]}

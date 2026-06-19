@@ -669,7 +669,7 @@ const InputForm = ({
 
                           shadow-[0_0_25px_rgba(168,85,247,0.12)]
 
-                          text-white
+                          text-[var(--text-primary)]
                         `
                         : `
                           border-[var(--border-color)]
