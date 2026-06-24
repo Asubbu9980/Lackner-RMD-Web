@@ -101,7 +101,7 @@ function calculateSchedule(inputs) {
 
     let rmd = factor === Infinity ? 0 : balance / factor;
 
-    
+
     rmd = Math.min(rmd, balance);
 
     const tax = rmd * taxRate;
@@ -117,10 +117,15 @@ function calculateSchedule(inputs) {
       year,
       age,
       beginBalance: balance,
+
       rmd,
       tax,
       growth,
-      endBalance
+      endBalance,
+
+      cumRmd,
+      cumTax,
+      cumGrowth
     });
 
     balance = endBalance;
