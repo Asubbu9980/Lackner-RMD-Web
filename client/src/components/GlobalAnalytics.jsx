@@ -280,7 +280,7 @@ export default function GlobalAnalytics() {
                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#a855f7', boxShadow: '0 0 8px #a855f7' }} />
                    <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7 }}>RMD</span>
                 </div>
-                <span style={{ fontSize: '15px', fontWeight: 800 }}><AnimatedValue value={rawData[hoveredIndex].rmd} /></span>
+                <span style={{ fontSize: '15px', fontWeight: 800 , color:'#a855f7'}}><AnimatedValue value={rawData[hoveredIndex].rmd} /></span>
              </div>
  
              

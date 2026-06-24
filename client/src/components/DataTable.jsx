@@ -231,19 +231,19 @@ const DataTable = () => {
               "var(--bg-secondary)",
 
             "&::-webkit-scrollbar":
-              {
-                width: 10,
-                height: 10,
-              },
+            {
+              width: 10,
+              height: 10,
+            },
 
             "&::-webkit-scrollbar-thumb":
-              {
-                background:
-                  "rgba(100,116,139,0.5)",
+            {
+              background:
+                "rgba(100,116,139,0.5)",
 
-                borderRadius:
-                  "999px",
-              },
+              borderRadius:
+                "999px",
+            },
           }}
         >
           <table
@@ -276,6 +276,9 @@ const DataTable = () => {
                 style={{
                   background:
                     "var(--hover-bg)",
+                  borderTopLeftRadius: "24px",
+                  borderTopRightRadius: "24px",
+                  overflow: "hidden",
 
                   backdropFilter:
                     "blur(12px)",
@@ -295,22 +298,37 @@ const DataTable = () => {
                     <th
                       key={i}
                       style={{
+                        width:
+                          head === "Year"
+                            ? "120px"
+                            : head === "Age"
+                              ? "100px"
+                              : head === "Ending Balance"
+                                ? "260px"
+                                : "180px",
                         padding:
                           "18px 20px",
+                        borderTopLeftRadius:
+                          i === 0 ? "24px" : 0,
+
+                        borderTopRightRadius:
+                          i === 4 ? "24px" : 0,
 
                         textAlign:
-                          "left",
+                          head === "Year" || head === "Age"
+                            ? "center"
+                            : "right",
 
                         fontSize:
-                          "12px",
+                          "11px",
 
                         textTransform:
                           "uppercase",
 
                         letterSpacing:
-                          "0.14em",
+                          "0.18em",
 
-                        fontWeight: 800,
+                        fontWeight: 700,
 
                         color:
                           "var(--text-secondary)",
@@ -361,7 +379,7 @@ const DataTable = () => {
                     ) => {
                       e.currentTarget.style.background =
                         i % 2 ===
-                        0
+                          0
                           ? "transparent"
                           : "rgba(255,255,255,0.01)";
                     }}
@@ -380,7 +398,7 @@ const DataTable = () => {
                           "var(--text-primary)",
 
                         fontWeight: 700,
-                        textAlign: "left",
+                        textAlign: "center",
                       }}
                     >
                       {r.year}
@@ -400,7 +418,7 @@ const DataTable = () => {
                           "var(--text-primary)",
 
                         fontWeight: 600,
-                        textAlign: "left",
+                        textAlign: "center",
                       }}
                     >
                       {r.age}
@@ -420,7 +438,7 @@ const DataTable = () => {
                           "#8b5cf6",
 
                         fontWeight: 700,
-                        textAlign: "left",
+                        textAlign: "right",
                         fontVariantNumeric:
                           "tabular-nums",
                       }}
@@ -444,7 +462,7 @@ const DataTable = () => {
                           "#ef4444",
 
                         fontWeight: 700,
-                        textAlign: "left",
+                        textAlign: "right",
 
                         fontVariantNumeric:
                           "tabular-nums",
@@ -468,11 +486,13 @@ const DataTable = () => {
                         color:
                           "var(--text-primary)",
 
-                        fontWeight: 800,
+                        fontWeight: 900,
+                        fontSize: "15px",
+                        letterSpacing: "-0.02em",
 
                         fontVariantNumeric:
                           "tabular-nums",
-                        textAlign: "left",
+                        textAlign: "right",
                       }}
                     >
                       {formatCurrency(

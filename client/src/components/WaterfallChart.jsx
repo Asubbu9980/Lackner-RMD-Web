@@ -11,6 +11,8 @@ import CascadeFlow3D from "./CascadeFlow3D";
 
 import PlotlyChart from "./PlotlyChart";
 
+import Waterfall2D from "./Waterfall2D";
+
 import { useThemeContext } from "../context/ThemeContext";
 
 import useRmd from "../hooks/useRmd";
@@ -138,7 +140,7 @@ const WaterfallChart = () => {
               borderRadius: "10px",
 
               "&.Mui-selected": {
-                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                background: "linear-gradient(135deg, #7c3aed, #2563eb)",
 
                 color: "#fff",
 
@@ -149,7 +151,9 @@ const WaterfallChart = () => {
         >
           <ToggleButton value="3d">Projection</ToggleButton>
 
-          <ToggleButton value="2d">Waterfall</ToggleButton>
+          <ToggleButton value="2d1">Waterfall</ToggleButton>
+
+          <ToggleButton value="2d2">Waterfall Prototype</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 
@@ -168,14 +172,18 @@ const WaterfallChart = () => {
             : "1px solid rgba(15,23,42,0.06)",
 
           background: isDark ? "#020617" : "#ffffff",
-
-          height: "420px",
+          height:
+            view === "2d2"
+              ? "700px"
+              : "420px",
         }}
       >
-        {view === "3d" ? (
+        {view === "3d" && (
           <CascadeFlow3D mode="WATERFALL" />
-        ) : (
+        )}
+        {view === "2d1" && (
           <PlotlyChart
+
             data={[
               {
                 x: rows.map((r) => r.beginBalance),
@@ -385,6 +393,10 @@ const WaterfallChart = () => {
               },
             }}
           />
+        )}
+
+        {view === "2d2" && (
+          <Waterfall2D rows={rows} />
         )}
       </Box>
     </Box>

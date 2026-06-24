@@ -264,7 +264,7 @@ const AdvancedChart = () => {
                   "&.Mui-selected": {
                     color: "#ffffff",
 
-                    background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
+                    background: "linear-gradient(135deg, #7c3aed, #2563eb)",
                   },
                 }}
               >
@@ -351,7 +351,7 @@ const AdvancedChart = () => {
                     "&.Mui-selected": {
                       color: "#ffffff",
 
-                      background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
+                      background: "linear-gradient(135deg,  #7c3aed, #2563eb)",
 
                       boxShadow: "0 4px 12px rgba(14,165,233,0.25)",
                     },
