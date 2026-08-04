@@ -13,6 +13,8 @@ import PlotlyChart from "./PlotlyChart";
 
 import Waterfall2D from "./Waterfall2D";
 
+import PortfolioJourney from "./portfolioJourney/PortfolioJourney";
+
 import { useThemeContext } from "../context/ThemeContext";
 
 import useRmd from "../hooks/useRmd";
@@ -154,6 +156,8 @@ const WaterfallChart = () => {
           <ToggleButton value="2d1">Waterfall</ToggleButton>
 
           <ToggleButton value="2d2">Waterfall Prototype</ToggleButton>
+
+          <ToggleButton value="echarts">Next Gen</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 
@@ -173,9 +177,11 @@ const WaterfallChart = () => {
 
           background: isDark ? "#020617" : "#ffffff",
           height:
-            view === "2d2"
-              ? "700px"
-              : "420px",
+            view === "echarts"
+              ? "920px"
+              : view === "2d2"
+                ? "700px"
+                : "420px",
         }}
       >
         {view === "3d" && (
@@ -397,6 +403,10 @@ const WaterfallChart = () => {
 
         {view === "2d2" && (
           <Waterfall2D rows={rows} />
+        )}
+
+        {view === "echarts" && (
+          <PortfolioJourney rows={rows} />
         )}
       </Box>
     </Box>
