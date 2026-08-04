@@ -13,7 +13,7 @@ import PlotlyChart from "./PlotlyChart";
 
 import Waterfall2D from "./Waterfall2D";
 
-import PortfolioJourney from "./portfolioJourney/PortfolioJourney";
+import PortfolioJourney from "./portfoliojourney/PortfolioJourney";
 
 import { useThemeContext } from "../context/ThemeContext";
 
