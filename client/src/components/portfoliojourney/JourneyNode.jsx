@@ -61,45 +61,42 @@ export default function JourneyNode({ data }) {
           }}
         />
 
-        <Box p={2.5}>
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
-            <Box
-              sx={{
-                width: 46,
-                height: 46,
+       <Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  }}
+>
+  <Box
+    sx={{
+      width: 46,
+      height: 46,
+      borderRadius: "50%",
+      display: "grid",
+      placeItems: "center",
+      bgcolor: `${data.color}22`,
+    }}
+  >
+    <Icon
+      sx={{
+        color: data.color,
+      }}
+    />
+  </Box>
 
-                borderRadius: "50%",
-
-                display: "grid",
-
-                placeItems: "center",
-
-                bgcolor: `${data.color}22`,
-              }}
-            >
-              <Icon
-                sx={{
-                  color: data.color,
-                }}
-              />
-            </Box>
-
-            <Typography
-              sx={{
-                color: "#cbd5e1",
-
-                fontWeight: 700,
-
-                fontSize: 15,
-              }}
-            >
-              {data.title}
-            </Typography>
-          </Box>
+  <Typography
+    sx={{
+      mt: 1,
+      color: "#cbd5e1",
+      fontWeight: 700,
+      fontSize: 15,
+      textAlign: "center",
+    }}
+  >
+    {data.title}
+  </Typography>
+</Box>
 
           <Typography
             sx={{
@@ -112,6 +109,9 @@ export default function JourneyNode({ data }) {
               color: "#fff",
 
               fontVariantNumeric: "tabular-nums",
+
+              textAlign: "right",
+              width: "100%",
             }}
           >
             $
@@ -130,7 +130,7 @@ export default function JourneyNode({ data }) {
             {data.subtitle}
           </Typography>
         </Box>
-      </Box>
+      
 
       <Handle
         type="source"
