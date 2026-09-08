@@ -15,6 +15,8 @@ import Waterfall2D from "./Waterfall2D";
 
 import PortfolioJourney from "./portfoliojourney/PortfolioJourney";
 
+import SankeyChart from "./portfoliojourney/SankeyChart";
+
 import { useThemeContext } from "../context/ThemeContext";
 
 import useRmd from "../hooks/useRmd";
@@ -158,6 +160,8 @@ const WaterfallChart = () => {
           <ToggleButton value="2d2">Waterfall Prototype</ToggleButton>
 
           <ToggleButton value="echarts">Next Gen</ToggleButton>
+
+          <ToggleButton value="sankey">Sankey</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 
@@ -179,9 +183,11 @@ const WaterfallChart = () => {
           height:
             view === "echarts"
               ? "920px"
-              : view === "2d2"
-                ? "700px"
-                : "420px",
+              : view === "sankey"
+                ? "600px"
+                : view === "2d2"
+                  ? "700px"
+                  : "420px",
         }}
       >
         {view === "3d" && (
@@ -407,6 +413,12 @@ const WaterfallChart = () => {
 
         {view === "echarts" && (
           <PortfolioJourney rows={rows} />
+        )}
+        {view === "sankey" && (
+          <SankeyChart
+            rows={rows}
+            selectedIndex={0}
+          />
         )}
       </Box>
     </Box>
