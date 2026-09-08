@@ -172,22 +172,27 @@ const WaterfallChart = () => {
       <Box
         sx={{
           borderRadius: "18px",
-
-          overflow: "hidden",
+          overflow: view === "sankey" ? "visible" : "hidden",
 
           border: isDark
             ? "1px solid rgba(255,255,255,0.04)"
             : "1px solid rgba(15,23,42,0.06)",
 
           background: isDark ? "#020617" : "#ffffff",
+
           height:
             view === "echarts"
               ? "920px"
               : view === "sankey"
-                ? "600px"
+                ? "auto"
                 : view === "2d2"
                   ? "700px"
                   : "420px",
+
+          minHeight:
+            view === "sankey"
+              ? "850px"
+              : undefined,
         }}
       >
         {view === "3d" && (

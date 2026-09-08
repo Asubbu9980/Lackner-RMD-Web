@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef } from "react";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as echarts from "echarts";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, Slider, useTheme } from "@mui/material";
 
 const formatMoney = (value = 0) =>
     new Intl.NumberFormat("en-US", {
@@ -17,7 +18,9 @@ export default function SankeyChart({
     const chartContainerRef = useRef(null);
     const chartInstanceRef = useRef(null);
 
-    const selectedRow = rows[selectedIndex] || rows[0];
+    const [currentIndex, setCurrentIndex] = useState(selectedIndex);
+
+    const selectedRow = rows[currentIndex] || rows[0];
 
     const chartData = useMemo(() => {
         if (!selectedRow) {
@@ -105,7 +108,9 @@ export default function SankeyChart({
                     value: netCash,
                 },
             ].filter((link) => link.value > 0),
+
             endingBalance,
+
             selectedYear:
                 selectedRow.year ??
                 selectedRow.age ??
@@ -123,9 +128,10 @@ export default function SankeyChart({
         chartInstanceRef.current = chart;
 
         chart.setOption({
+            animation: true,
+
             tooltip: {
                 trigger: "item",
-
                 formatter: (params) => {
                     if (params.dataType === "edge") {
                         const source = params.data.source;
@@ -133,51 +139,65 @@ export default function SankeyChart({
                         const value = Number(params.data.value || 0);
 
                         return `
-        <div style="font-weight:700;margin-bottom:6px">
-          ${source} → ${target}
-        </div>
-        <div>Flow amount: <strong>${formatMoney(value)}</strong></div>
-      `;
+                            <div style="font-weight:700;margin-bottom:6px">
+                                ${source} → ${target}
+                            </div>
+                            <div>
+                                Flow amount:
+                                <strong>${formatMoney(value)}</strong>
+                            </div>
+                        `;
                     }
 
                     if (params.dataType === "node") {
                         return `
-        <div style="font-weight:700">
-          ${params.name}
-        </div>
-      `;
+                            <div style="font-weight:700;margin-bottom:6px">
+                                ${params.name}
+                            </div>
+                            <div>
+                                Hover over a flow to view its amount.
+                            </div>
+                        `;
                     }
 
                     return "";
                 },
             },
+
             series: [
                 {
                     type: "sankey",
+
                     left: "4%",
                     right: "15%",
-                    top: "8%",
-                    bottom: "8%",
+                    top: "3%",
+                    bottom: "12%",
+
                     nodeWidth: 28,
-                    nodeGap: 24,
+                    nodeGap: 42,
                     draggable: true,
+
                     emphasis: {
                         focus: "adjacency",
                         lineStyle: {
                             opacity: 0.9,
                         },
                     },
+
                     data: chartData.nodes,
                     links: chartData.links,
+
                     lineStyle: {
                         color: "gradient",
                         curveness: 0.5,
                         opacity: 0.55,
                     },
+
                     itemStyle: {
                         borderWidth: 1,
                         borderColor: theme.palette.divider,
                     },
+
                     label: {
                         color: theme.palette.text.primary,
                         fontSize: 12,
@@ -210,6 +230,15 @@ export default function SankeyChart({
         );
     }
 
+    const firstYear = rows[0]?.year ?? rows[0]?.age ?? 0;
+
+    const lastYear =
+        rows[rows.length - 1]?.year ??
+        rows[rows.length - 1]?.age ??
+        rows.length - 1;
+
+    const lastIndex = Math.max(rows.length - 1, 0);
+
     return (
         <Box
             sx={{
@@ -218,6 +247,7 @@ export default function SankeyChart({
                 borderRadius: 2,
                 p: 2,
                 backgroundColor: theme.palette.background.paper,
+                overflow: "visible",
             }}
         >
             <Typography variant="h6" sx={{ mb: 0.5 }}>
@@ -229,11 +259,68 @@ export default function SankeyChart({
             </Typography>
 
             <Box
+                sx={{
+                    px: 1,
+                    mt: 1,
+                    overflow: "visible",
+                }}
+            >
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 0.5 }}
+                >
+                    Year
+                </Typography>
+
+                <Slider
+                    min={0}
+                    max={lastIndex}
+                    step={1}
+                    value={Math.min(currentIndex, lastIndex)}
+                    onChange={(_, value) => {
+                        setCurrentIndex(Number(value));
+                    }}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(index) => {
+                        const row = rows[index];
+
+                        return (
+                            row?.year ??
+                            row?.age ??
+                            row?.label ??
+                            index
+                        );
+                    }}
+                    marks={[
+                        {
+                            value: 0,
+                            label: String(firstYear),
+                        },
+                        {
+                            value: lastIndex,
+                            label: String(lastYear),
+                        },
+                    ]}
+                    sx={{
+                        mt: 1,
+                        mb: 2,
+                        color: theme.palette.primary.main,
+                    }}
+                />
+            </Box>
+
+            <Box
                 ref={chartContainerRef}
                 sx={{
                     width: "100%",
-                    height: { xs: 420, md: 500 },
-                    mt: 1,
+                    height: {
+                        xs: 760,
+                        sm: 720,
+                        md: 760,
+                    },
+                    mt: 0,
+                    overflow: "visible",
                 }}
             />
 
