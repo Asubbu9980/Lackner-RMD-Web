@@ -45,6 +45,7 @@ import {
   TableSection,
   ResultsSkeleton,
 } from "../../components/dashboard/ResultSections";
+import { scrollToSection } from "../../utils/scroll";
 
 const STEPS = [
   {
@@ -365,8 +366,7 @@ const PlannerLayout = () => {
   const insights = deriveInsights(result, inputs);
   const needsDeathDate = isDeceasedScenario(inputs.scenario) && !inputs.date_Death_Owner;
 
-  const scrollToAnalysis = () =>
-    document.getElementById("planner-analysis")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollToAnalysis = () => scrollToSection(document.getElementById("planner-analysis"));
 
   return (
     <div className="mx-auto max-w-[1500px] space-y-5">
@@ -381,8 +381,10 @@ const PlannerLayout = () => {
             ) : !result ? (
               <div className="h-24 animate-pulse rounded-xl bg-[var(--hover-bg)]" />
             ) : (
-              <div className={`space-y-5 transition-opacity ${loading ? "opacity-60" : ""}`}>
-                <Summary insights={insights} inputs={inputs} />
+              <div className="space-y-5">
+                <div className={`transition-opacity duration-300 ${loading ? "opacity-60" : ""}`}>
+                  <Summary insights={insights} inputs={inputs} />
+                </div>
                 <KpiGrid
                   variant="hero"
                   insights={insights}
@@ -404,7 +406,7 @@ const PlannerLayout = () => {
       )}
 
       {/* FULL ANALYSIS */}
-      <div id="planner-analysis" className="scroll-mt-24 space-y-5">
+      <div id="planner-analysis" tabIndex={-1} aria-label="Full analysis" className="scroll-mt-[5.5rem] space-y-5">
         {needsDeathDate ? null : !result ? (
           <ResultsSkeleton />
         ) : (
@@ -433,9 +435,9 @@ const PlannerLayout = () => {
                     rounded-lg
                     border
                     border-[var(--border-color)]
-                    px-3
-                    py-1.5
-                    text-xs
+                    px-4
+                    py-2
+                    text-sm
                     font-semibold
                     text-[var(--text-primary)]
                     hover:bg-[var(--hover-bg)]

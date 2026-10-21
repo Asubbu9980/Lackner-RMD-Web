@@ -2,6 +2,8 @@ import { Wallet, CalendarClock, TrendingUp, Landmark, HandCoins, PiggyBank } fro
 
 import { formatCurrency, formatCompact, formatPercent } from "../../utils/format";
 import { getPlan } from "../../utils/rmd";
+import useRmd from "../../hooks/useRmd";
+import Skeleton from "./Skeleton";
 
 const buildKpis = (insights, inputs) => [
   {
@@ -67,7 +69,9 @@ const buildKpis = (insights, inputs) => [
 
 // variant "compact" — six tiles across (Workspace)
 // variant "hero" — fewer, larger tiles (Planner)
-const KpiGrid = ({ insights, inputs, keys, variant = "compact", loading }) => {
+const KpiGrid = ({ insights, inputs, keys, variant = "compact" }) => {
+  // shimmer the numbers from the moment an input changes until the result lands
+  const { calculating } = useRmd();
   const kpis = buildKpis(insights, inputs).filter((k) => !keys || keys.includes(k.key));
 
   const isHero = variant === "hero";
@@ -77,13 +81,8 @@ const KpiGrid = ({ insights, inputs, keys, variant = "compact", loading }) => {
     // (instead of truncating values) when the text-size control is raised.
     <div
       style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${isHero ? 200 : 170}px, 1fr))` }}
-      className={`
-        grid
-        gap-3
-        transition-opacity
-        duration-300
-        ${loading ? "opacity-60" : "opacity-100"}
-      `}
+      aria-busy={calculating}
+      className="grid gap-3"
     >
       {kpis.map((k) => {
         const Icon = k.icon;
@@ -121,24 +120,33 @@ const KpiGrid = ({ insights, inputs, keys, variant = "compact", loading }) => {
               <Icon size={isHero ? 20 : 16} className={`shrink-0 ${k.tone}`} />
             </div>
 
-            <p
-              className={`
-                mt-2
-                truncate
-                font-black
-                tracking-tight
-                tabular-nums
-                ${isHero ? "text-3xl" : "text-xl xl:text-2xl"}
-                ${k.danger ? "text-rose-400" : "text-[var(--text-primary)]"}
-              `}
-              title={k.value}
-            >
-              {k.value}
-            </p>
+            {calculating ? (
+              <>
+                <Skeleton className={`mt-2.5 w-3/4 ${isHero ? "h-8" : "h-7"}`} />
+                <Skeleton className="mt-2 h-3.5 w-1/2" />
+              </>
+            ) : (
+              <div key={k.value} className="rmd-fade-in">
+                <p
+                  className={`
+                    mt-2
+                    truncate
+                    font-black
+                    tracking-tight
+                    tabular-nums
+                    ${isHero ? "text-3xl" : "text-xl xl:text-2xl"}
+                    ${k.danger ? "text-rose-400" : "text-[var(--text-primary)]"}
+                  `}
+                  title={k.value}
+                >
+                  {k.value}
+                </p>
 
-            <p className="mt-1 truncate text-xs text-[var(--text-secondary)]" title={k.subtitle}>
-              {k.subtitle}
-            </p>
+                <p className="mt-1 truncate text-xs text-[var(--text-secondary)]" title={k.subtitle}>
+                  {k.subtitle}
+                </p>
+              </div>
+            )}
           </div>
         );
       })}

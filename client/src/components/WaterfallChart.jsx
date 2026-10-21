@@ -53,9 +53,9 @@ const WaterfallChart = () => {
           ? "0 12px 35px rgba(0,0,0,0.4)"
           : "0 6px 20px rgba(15,23,42,0.08)",
 
-        p: 2,
+        p: { xs: 1.5, sm: 2 },
 
-        transition: "all 0.3s ease",
+        transition: "background 0.3s ease, border-color 0.3s ease",
       }}
     >
       {/* =====================================================
@@ -66,9 +66,13 @@ const WaterfallChart = () => {
         sx={{
           display: "flex",
 
+          flexDirection: { xs: "column", md: "row" },
+
           justifyContent: "space-between",
 
-          alignItems: "center",
+          alignItems: { xs: "stretch", md: "center" },
+
+          gap: 1.5,
 
           mb: 1.8,
 
@@ -105,9 +109,9 @@ const WaterfallChart = () => {
             sx={{
               mt: 0.3,
 
-              fontSize: 12,
+              fontSize: "max(12px, 0.875rem)",
 
-              color: isDark ? "rgba(255,255,255,0.65)" : "#64748b",
+              color: isDark ? "rgba(255,255,255,0.72)" : "#475569",
             }}
           >
             Interactive Wealth Flow Visualization
@@ -128,12 +132,27 @@ const WaterfallChart = () => {
 
             p: 0.4,
 
+            // wraps into rows on narrow screens instead of overflowing
+            flexWrap: "wrap",
+            gap: 0.5,
+            alignSelf: { xs: "flex-start", md: "auto" },
+            maxWidth: "100%",
+
+            "& .MuiToggleButtonGroup-grouped": {
+              borderRadius: "10px !important",
+              ml: "0 !important",
+            },
+
             "& .MuiToggleButton-root": {
               border: 0,
 
-              color: isDark ? "#94a3b8" : "#475569",
+              minHeight: { xs: 40, md: "auto" },
 
-              px: 2,
+              fontSize: { xs: "0.875rem", md: "0.8125rem" },
+
+              color: isDark ? "#cbd5e1" : "#475569",
+
+              px: { xs: 1.5, sm: 2 },
 
               py: 0.8,
 
@@ -180,18 +199,21 @@ const WaterfallChart = () => {
 
           background: isDark ? "#020617" : "#ffffff",
 
+          // shorter on phones; the bar list (2d1) keeps room for a row per year
           height:
             view === "echarts"
-              ? "920px"
+              ? { xs: "640px", md: "920px" }
               : view === "sankey"
                 ? "auto"
                 : view === "2d2"
-                  ? "700px"
-                  : "420px",
+                  ? { xs: "520px", md: "700px" }
+                  : view === "3d"
+                    ? { xs: "340px", sm: "400px", md: "420px" }
+                    : "420px",
 
           minHeight:
             view === "sankey"
-              ? "850px"
+              ? { xs: "600px", md: "850px" }
               : undefined,
         }}
       >

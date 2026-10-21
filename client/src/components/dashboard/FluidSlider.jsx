@@ -4,7 +4,7 @@ import { Minus, Plus } from "lucide-react";
 
 // Must match the .fluid-range thumb size in index.css — the custom visuals
 // use the same geometry as the (invisible) native thumb so clicks line up.
-const THUMB = 24;
+const THUMB = 28;
 
 const at = (pct) => `calc(${THUMB / 2}px + ${pct / 100} * (100% - ${THUMB}px))`;
 
@@ -75,8 +75,8 @@ const FluidSlider = ({
 
   const stepperClass = `
     flex
-    h-10
-    w-10
+    h-12
+    w-12
     shrink-0
     items-center
     justify-center
@@ -102,10 +102,10 @@ const FluidSlider = ({
         onClick={() => nudge(-1)}
         className={stepperClass}
       >
-        <Minus size={16} strokeWidth={2.5} />
+        <Minus size={20} strokeWidth={2.5} />
       </button>
 
-      <div className="relative min-w-0 flex-1 pt-10 pb-6 select-none">
+      <div className="relative min-w-0 flex-1 pt-11 pb-6 select-none">
         {/* VALUE BUBBLE */}
         <div
           aria-hidden
@@ -120,7 +120,7 @@ const FluidSlider = ({
               ${t.bubble}
               px-2.5
               py-1
-              text-sm
+              text-base
               font-black
               tabular-nums
               text-white
@@ -137,7 +137,7 @@ const FluidSlider = ({
         </div>
 
         {/* TRACK */}
-        <div className="relative h-3 rounded-full border border-[var(--border-color)] bg-[var(--hover-bg)]">
+        <div className="relative h-3.5 rounded-full border border-[var(--border-color)] bg-[var(--hover-bg)]">
           {/* fill */}
           <div
             className={`absolute inset-y-0 left-0 overflow-hidden rounded-full bg-gradient-to-r ${t.fill} transition-[width] ${motion}`}
@@ -210,14 +210,14 @@ const FluidSlider = ({
             onPointerDown={startDrag}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className="fluid-range absolute inset-x-0 top-1/2 h-10 w-full -translate-y-1/2 cursor-grab active:cursor-grabbing"
+            className="fluid-range absolute inset-x-0 top-1/2 h-12 w-full touch-pan-y -translate-y-1/2 cursor-grab active:cursor-grabbing"
           />
         </div>
 
         {/* MIN / MAX */}
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 flex justify-between text-[11px] font-semibold tabular-nums text-[var(--text-secondary)]"
+          className="absolute inset-x-0 bottom-0 flex justify-between text-xs font-semibold tabular-nums text-[var(--text-secondary)]"
         >
           <span>
             {min}
@@ -237,7 +237,7 @@ const FluidSlider = ({
         onClick={() => nudge(1)}
         className={stepperClass}
       >
-        <Plus size={16} strokeWidth={2.5} />
+        <Plus size={20} strokeWidth={2.5} />
       </button>
     </div>
   );

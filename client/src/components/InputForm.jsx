@@ -1,14 +1,18 @@
-/* eslint-disable no-unused-vars */
-import { useState } from "react";
-
 import {
   Calculator,
   SlidersHorizontal,
+  ChevronDown,
   FileOutput,
   Printer,
   RotateCcw,
   Sparkles,
   CheckCircle2,
+  ArrowDown,
+  LoaderCircle,
+  LineChart,
+  Table2,
+  TrendingUp,
+  Landmark,
 } from "lucide-react";
 
 import useRmd from "../hooks/useRmd";
@@ -50,6 +54,109 @@ const scenarios = [
   },
 ];
 
+// Readable, sentence-case field labels (the uppercase micro-labels were hard
+// to read for older eyes)
+const labelClass = `
+  block
+
+  text-sm
+  font-semibold
+
+  text-[var(--text-primary)]
+
+  mb-2
+`;
+
+// "Age 73" beside a birth-year label; hidden until the year is a real one
+const AgeTag = ({ year }) => {
+  const thisYear = new Date().getFullYear();
+  const valid = Number.isInteger(year) && year >= 1900 && year <= thisYear;
+
+  if (!valid) return null;
+
+  return (
+    <span
+      title={`Age reached in ${thisYear}`}
+      className="
+        shrink-0
+        rounded-full
+        bg-purple-500/10
+        px-2.5
+        py-0.5
+        text-sm
+        font-bold
+        tabular-nums
+        text-purple-700
+        dark:text-purple-200
+      "
+    >
+      Age {thisYear - year}
+    </span>
+  );
+};
+
+const inputClass = `
+  w-full
+  min-h-[3rem]
+
+  rounded-2xl
+
+  border
+  border-[var(--border-color)]
+
+  bg-[var(--bg-secondary)]
+
+  px-4
+  py-3
+
+  text-base
+  font-semibold
+  tabular-nums
+  text-[var(--text-primary)]
+
+  outline-none
+
+  transition-[border-color,box-shadow]
+  duration-300
+
+  focus:border-purple-400
+  focus:ring-4
+  focus:ring-purple-400/20
+
+  hover:border-purple-400/40
+`;
+
+const secondaryButton = `
+  flex
+  min-h-[3rem]
+  flex-1
+  basis-[6rem]
+  items-center
+  justify-center
+  gap-2
+
+  px-3
+  py-2.5
+
+  rounded-2xl
+
+  border
+  border-[var(--border-color)]
+
+  bg-[var(--bg-secondary)]
+
+  text-[var(--text-primary)]
+  text-sm
+  font-semibold
+  whitespace-nowrap
+
+  hover:bg-[var(--hover-bg)]
+  hover:border-purple-400/40
+
+  transition-colors
+  duration-300
+`;
+
 const InputForm = ({
   showChart,
   setShowChart,
@@ -62,8 +169,14 @@ const InputForm = ({
 
   showTax,
   setShowTax,
+
+  // scrolls to the results; set by ClassicLayout
+  onCalculate,
+
+  // lets the layout know when this button is on screen (sticky bar)
+  calculateRef,
 }) => {
-  const { inputs, setInputs } =
+  const { inputs, setInputs, calculating } =
     useRmd();
 
   const handleChange = (e) => {
@@ -120,34 +233,6 @@ const InputForm = ({
     a.click();
   };
 
-  const inputClass = `
-    w-full
-
-    rounded-2xl
-
-    border
-    border-[var(--border-color)]
-
-    bg-[var(--bg-secondary)]
-
-    px-4
-    py-3
-
-    text-sm
-    text-[var(--text-primary)]
-
-    outline-none
-
-    transition-all
-    duration-300
-
-    focus:border-purple-400
-    focus:ring-4
-    focus:ring-purple-400/10
-
-    hover:border-purple-400/30
-  `;
-
   return (
     <div
       className="
@@ -166,7 +251,8 @@ const InputForm = ({
 
         shadow-[0_20px_60px_rgba(0,0,0,0.18)]
 
-        p-5
+        p-4
+        sm:p-5
 
         transition-colors
         duration-300
@@ -207,11 +293,12 @@ const InputForm = ({
           flex
           items-center
           justify-between
+          gap-3
 
           mb-6
         "
       >
-        <div>
+        <div className="min-w-0">
           <div
             className="
               inline-flex
@@ -233,20 +320,21 @@ const InputForm = ({
           >
             <Sparkles
               size={14}
-              className="text-purple-300"
+              className="text-purple-600 dark:text-purple-300"
             />
 
             <span
               className="
-                text-[11px]
+                text-xs
                 uppercase
-                tracking-[0.18em]
+                tracking-[0.16em]
 
-                text-purple-300
-                font-semibold
+                text-purple-700
+                dark:text-purple-300
+                font-bold
               "
             >
-              Configuration
+              Step 1 · Your details
             </span>
           </div>
 
@@ -264,15 +352,17 @@ const InputForm = ({
 
           <p
             className="
-              text-sm
+              text-base
+              leading-snug
               text-[var(--text-secondary)]
 
               mt-1
             "
           >
-            Configure financial
-            assumptions and
-            projection scenarios
+            Enter your account and
+            family details, then tap
+            Calculate to see your
+            results.
           </p>
         </div>
 
@@ -281,6 +371,7 @@ const InputForm = ({
             hidden
             xl:flex
 
+            shrink-0
             items-center
             justify-center
 
@@ -307,7 +398,7 @@ const InputForm = ({
           FORM
       ===================================== */}
 
-      <div className="relative z-10 space-y-6">
+      <div className="relative z-10 space-y-7">
         {/* =================================
             FINANCIAL INPUTS
         ================================= */}
@@ -316,66 +407,66 @@ const InputForm = ({
           className="
             grid
             grid-cols-1
-            md:grid-cols-2
+            sm:grid-cols-2
 
-            gap-4
+            items-end
+
+            gap-x-4
+            gap-y-5
           "
         >
           {/* START BALANCE */}
 
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-2
-              "
+              htmlFor="classic_balance_Start"
+              className={labelClass}
             >
-              Starting Balance
+              Starting balance
             </label>
 
-            <input
-              name="balance_Start"
-              value={
-                inputs.balance_Start
-              }
-              onChange={
-                handleChange
-              }
-              className={
-                inputClass
-              }
-            />
+            <div className="relative">
+              <span
+                aria-hidden
+                className="
+                  pointer-events-none
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+
+                  text-base
+                  font-bold
+                  text-[var(--text-secondary)]
+                "
+              >
+                $
+              </span>
+
+              <input
+                id="classic_balance_Start"
+                name="balance_Start"
+                inputMode="decimal"
+                autoComplete="off"
+                value={
+                  inputs.balance_Start
+                }
+                onChange={
+                  handleChange
+                }
+                className={`${inputClass} pl-8`}
+              />
+            </div>
           </div>
 
           {/* GROWTH */}
 
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label
               htmlFor="classic_growth_Rate"
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-1
-              "
+              className={labelClass}
             >
-              Growth Rate (%)
+              Yearly growth rate
             </label>
 
             <FluidSlider
@@ -399,24 +490,12 @@ const InputForm = ({
 
           {/* TAX */}
 
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label
               htmlFor="classic_tax_Rate"
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-1
-              "
+              className={labelClass}
             >
-              Tax Rate (%)
+              Tax rate on withdrawals
             </label>
 
             <FluidSlider
@@ -442,25 +521,18 @@ const InputForm = ({
 
           <div>
             <label
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-2
-              "
+              htmlFor="classic_year_Birth_Owner"
+              className={`${labelClass} flex items-baseline justify-between gap-2`}
             >
-              Owner Birth Year
+              Owner birth year
+              <AgeTag year={inputs.year_Birth_Owner} />
             </label>
 
             <input
+              id="classic_year_Birth_Owner"
               name="year_Birth_Owner"
+              inputMode="numeric"
+              autoComplete="off"
               value={
                 inputs.year_Birth_Owner
               }
@@ -477,25 +549,18 @@ const InputForm = ({
 
           <div>
             <label
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-2
-              "
+              htmlFor="classic_year_Birth_Beny"
+              className={`${labelClass} flex items-baseline justify-between gap-2`}
             >
-              Beneficiary Birth Year
+              Beneficiary birth year
+              <AgeTag year={inputs.year_Birth_Beny} />
             </label>
 
             <input
+              id="classic_year_Birth_Beny"
               name="year_Birth_Beny"
+              inputMode="numeric"
+              autoComplete="off"
               value={
                 inputs.year_Birth_Beny
               }
@@ -512,24 +577,17 @@ const InputForm = ({
 
           <div>
             <label
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-2
-              "
+              htmlFor="classic_date_Death_Owner"
+              className={labelClass}
             >
-              Date of Death
+              Owner date of death
+              <span className="ml-1 font-normal text-[var(--text-secondary)]">
+                (if inherited)
+              </span>
             </label>
 
             <input
+              id="classic_date_Death_Owner"
               type="date"
               name="date_Death_Owner"
               value={
@@ -555,53 +613,50 @@ const InputForm = ({
 
           <div>
             <label
-              className="
-                block
-
-                text-xs
-                font-semibold
-
-                uppercase
-                tracking-[0.14em]
-
-                text-[var(--text-secondary)]
-
-                mb-2
-              "
+              htmlFor="classic_plan"
+              className={labelClass}
             >
-              Plan Type
+              Plan type
             </label>
 
-            <select
-              value={
-                inputs.plan
-              }
-              onChange={(
-                e
-              ) =>
-                setInputs({
-                  ...inputs,
-
-                  plan:
-                    e.target.value,
-                })
-              }
-              className={
-                inputClass
-              }
-            >
-              <option value="IRA">
-                Traditional IRA
-              </option>
-
-              <option value="401k">
-                401(k)
-              </option>
-
-              <option value="Roth">
-                Roth IRA
-              </option>
-            </select>
+            <div className="relative">
+              <select
+                id="classic_plan"
+                value={
+                  inputs.plan
+                }
+                onChange={(
+                  e
+                ) =>
+                  setInputs({
+                    ...inputs,
+  
+                    plan:
+                      e.target.value,
+                  })
+                }
+                className={`${inputClass} cursor-pointer appearance-none pr-11`}
+              >
+                <option value="IRA">
+                  Traditional IRA
+                </option>
+  
+                <option value="401k">
+                  401(k)
+                </option>
+  
+                <option value="Roth">
+                  Roth IRA
+                </option>
+              </select>
+  
+              {/* own chevron — the native one sits at a different inset per browser */}
+              <ChevronDown
+                size={20}
+                aria-hidden
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
+              />
+            </div>
           </div>
         </div>
 
@@ -616,36 +671,37 @@ const InputForm = ({
               items-center
               gap-2
 
-              mb-4
+              mb-3
             "
           >
             <SlidersHorizontal
-              size={16}
-              className="text-purple-300"
+              size={18}
+              className="text-purple-600 dark:text-purple-300"
             />
 
             <h4
               className="
-                text-sm
+                text-base
                 font-bold
-
-                uppercase
-                tracking-[0.14em]
 
                 text-[var(--text-primary)]
               "
             >
-              Scenario Selection
+              Which situation applies?
             </h4>
           </div>
 
-          {/* compact pills — label is "Chart 01 · Uniform Lifetime" */}
+          {/* pills — label is "Chart 01 · Uniform Lifetime"; full-width rows on phones */}
           <div
             role="radiogroup"
             aria-label="Scenario"
             className="
-              flex
-              flex-wrap
+              grid
+              grid-cols-1
+              min-[480px]:grid-cols-2
+              lg:flex
+              lg:flex-wrap
+
               gap-2
             "
           >
@@ -668,9 +724,10 @@ const InputForm = ({
                     })
                   }
                   className={`
-                    inline-flex
+                    flex
+                    min-h-[2.75rem]
                     items-center
-                    gap-1.5
+                    gap-2
 
                     rounded-full
 
@@ -678,21 +735,22 @@ const InputForm = ({
 
                     py-1.5
                     pl-1.5
-                    pr-3
+                    pr-3.5
 
-                    text-xs
+                    text-left
+                    text-sm
                     font-semibold
 
-                    transition-all
+                    transition-[background-color,border-color,color,box-shadow,transform]
                     duration-300
 
                     hover:transform-none
-                    active:scale-95
+                    active:scale-[0.97]
 
                     ${
                       active
                         ? `
-                          border-purple-400/60
+                          border-purple-400/70
 
                           bg-gradient-to-r
                           from-purple-500/20
@@ -717,12 +775,14 @@ const InputForm = ({
                 >
                   <span
                     className={`
+                      shrink-0
+
                       rounded-full
 
-                      px-1.5
+                      px-2
                       py-0.5
 
-                      text-[10px]
+                      text-xs
                       font-bold
                       tabular-nums
 
@@ -731,7 +791,7 @@ const InputForm = ({
 
                       ${
                         active
-                          ? "bg-purple-500 text-white"
+                          ? "bg-purple-600 text-white"
                           : "bg-[var(--hover-bg)] text-[var(--text-secondary)]"
                       }
                     `}
@@ -739,12 +799,14 @@ const InputForm = ({
                     {chart.replace("Chart ", "")}
                   </span>
 
-                  {title}
+                  <span className="min-w-0 flex-1">
+                    {title}
+                  </span>
 
                   {active && (
                     <CheckCircle2
-                      size={14}
-                      className="text-purple-400"
+                      size={18}
+                      className="shrink-0 text-purple-600 dark:text-purple-400"
                     />
                   )}
                 </button>
@@ -757,7 +819,7 @@ const InputForm = ({
             DISPLAY
         ================================= */}
 
-        <div
+        <fieldset
           className="
             rounded-[var(--card-radius)]
 
@@ -766,37 +828,38 @@ const InputForm = ({
 
             bg-[var(--bg-secondary)]
 
-            p-5
+            p-4
+            sm:p-5
           "
         >
-          <h4
+          <legend
             className="
-              text-sm
+              px-1
+
+              text-base
               font-bold
 
-              uppercase
-              tracking-[0.14em]
-
               text-[var(--text-primary)]
-
-              mb-4
             "
           >
-            Display Settings
-          </h4>
+            What to show
+          </legend>
 
           <div
             className="
               grid
               grid-cols-2
 
-              gap-4
+              gap-2
+              sm:gap-3
             "
           >
             {[
               {
                 label:
-                  "Chart",
+                  "Charts",
+                icon:
+                  LineChart,
                 checked:
                   showChart,
 
@@ -807,6 +870,8 @@ const InputForm = ({
               {
                 label:
                   "Table",
+                icon:
+                  Table2,
                 checked:
                   showTable,
 
@@ -817,6 +882,8 @@ const InputForm = ({
               {
                 label:
                   "Growth",
+                icon:
+                  TrendingUp,
                 checked:
                   showGrowth,
 
@@ -827,6 +894,8 @@ const InputForm = ({
               {
                 label:
                   "Tax",
+                icon:
+                  Landmark,
                 checked:
                   showTax,
 
@@ -835,214 +904,252 @@ const InputForm = ({
               },
             ].map(
               (
-                item,
-                i
-              ) => (
-                <label
-                  key={i}
-                  className="
-                    flex
-                    items-center
-                    gap-3
+                item
+              ) => {
+                const Icon = item.icon;
 
-                    cursor-pointer
-                  "
-                >
-                  <input
-                    type="checkbox"
-                    checked={
-                      item.checked
-                    }
-                    onChange={() =>
-                      item.action(
-                        !item.checked
-                      )
-                    }
-                    className="
-                      accent-purple-500
-                      w-4
-                      h-4
-                    "
-                  />
+                // whole tile is the tap target
+                return (
+                  <label
+                    key={item.label}
+                    className={`
+                      flex
+                      min-h-[3rem]
+                      items-center
+                      gap-3
 
-                  <span
-                    className="
-                      text-sm
-                      text-[var(--text-primary)]
-                    "
+                      rounded-2xl
+
+                      border
+
+                      px-3
+                      py-2
+
+                      cursor-pointer
+                      select-none
+
+                      transition-colors
+                      duration-300
+
+                      has-[:focus-visible]:outline
+                      has-[:focus-visible]:outline-[3px]
+                      has-[:focus-visible]:outline-purple-500
+                      has-[:focus-visible]:outline-offset-2
+
+                      ${
+                        item.checked
+                          ? "border-purple-400/60 bg-purple-500/10"
+                          : "border-[var(--border-color)] hover:bg-[var(--hover-bg)]"
+                      }
+                    `}
                   >
-                    {item.label}
-                  </span>
-                </label>
-              )
+                    <input
+                      type="checkbox"
+                      checked={
+                        item.checked
+                      }
+                      onChange={() =>
+                        item.action(
+                          !item.checked
+                        )
+                      }
+                      className="
+                        accent-purple-600
+                        w-5
+                        h-5
+                        shrink-0
+                        cursor-pointer
+                      "
+                    />
+
+                    <Icon
+                      size={18}
+                      aria-hidden
+                      className={`shrink-0 ${item.checked ? "text-purple-600 dark:text-purple-300" : "text-[var(--text-secondary)]"}`}
+                    />
+
+                    <span
+                      className="
+                        text-base
+                        font-semibold
+                        text-[var(--text-primary)]
+                      "
+                    >
+                      {item.label}
+                    </span>
+                  </label>
+                );
+              }
             )}
           </div>
-        </div>
+        </fieldset>
 
         {/* =================================
             ACTIONS
         ================================= */}
 
-        <div
-          className="
-            flex
-            flex-wrap
-
-            gap-3
-
-            pt-2
-          "
-        >
-          {/* CALCULATE */}
+        <div className="space-y-3 pt-1">
+          {/* CALCULATE — results update live; this takes the reader to them */}
 
           <button
+            ref={calculateRef}
+            type="button"
+            onClick={onCalculate}
+            aria-describedby="classic-calc-hint"
             className="
-              flex
-              items-center
-              gap-2
+              group
+              relative
 
-              px-5
-              py-3
+              flex
+              w-full
+              min-h-[3.75rem]
+              items-center
+              justify-center
+              gap-3
+
+              overflow-hidden
+
+              px-6
+              py-4
 
               rounded-2xl
 
               bg-gradient-to-r
-              from-purple-500
+              from-purple-600
+              via-violet-600
               to-indigo-600
 
               text-white
-              text-sm
-              font-semibold
+              text-lg
+              font-extrabold
+              tracking-tight
 
-              shadow-[0_0_30px_rgba(168,85,247,0.25)]
+              shadow-[0_10px_30px_rgba(124,58,237,0.35)]
 
-              transition-all
+              transition-[transform,box-shadow]
               duration-300
 
-              hover:-translate-y-[1px]
-              hover:scale-[1.02]
+              hover:-translate-y-0.5
+              hover:shadow-[0_14px_40px_rgba(124,58,237,0.45)]
+
+              active:translate-y-0
+              active:scale-[0.99]
             "
           >
-            <Calculator
-              size={16}
+            {/* soft sheen */}
+            <span
+              aria-hidden
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+
+                bg-gradient-to-b
+                from-white/15
+                to-transparent
+              "
             />
 
-            Calculate
+            {calculating ? (
+              <LoaderCircle
+                size={24}
+                aria-hidden
+                className="relative animate-spin motion-reduce:animate-none"
+              />
+            ) : (
+              <Calculator
+                size={24}
+                aria-hidden
+                className="relative"
+              />
+            )}
+
+            <span className="relative">
+              {calculating ? "Calculating…" : "Calculate"}
+            </span>
+
+            <ArrowDown
+              size={22}
+              aria-hidden
+              className="
+                relative
+
+                transition-transform
+                duration-300
+
+                group-hover:translate-y-0.5
+                motion-reduce:transition-none
+              "
+            />
           </button>
 
-          {/* RESET */}
+          <p
+            id="classic-calc-hint"
+            className="
+              text-center
+              text-sm
+              text-[var(--text-secondary)]
+            "
+          >
+            Shows your results and charts
+          </p>
 
-          <button
-            onClick={
-              handleReset
-            }
+          {/* SECONDARY */}
+
+          <div
             className="
               flex
-              items-center
+              flex-wrap
+
               gap-2
-
-              px-5
-              py-3
-
-              rounded-2xl
-
-              border
-              border-[var(--border-color)]
-
-              bg-[var(--bg-secondary)]
-
-              text-[var(--text-primary)]
-              text-sm
-              font-medium
-
-              hover:bg-[var(--hover-bg)]
-
-              transition-all
-              duration-300
             "
           >
-            <RotateCcw
-              size={16}
-            />
+            <button
+              type="button"
+              onClick={
+                handleReset
+              }
+              className={secondaryButton}
+            >
+              <RotateCcw
+                size={18}
+                aria-hidden
+              />
 
-            Reset
-          </button>
+              Reset
+            </button>
 
-          {/* PRINT */}
+            <button
+              type="button"
+              onClick={
+                handlePrint
+              }
+              className={secondaryButton}
+            >
+              <Printer
+                size={18}
+                aria-hidden
+              />
 
-          <button
-            onClick={
-              handlePrint
-            }
-            className="
-              flex
-              items-center
-              gap-2
+              Print
+            </button>
 
-              px-5
-              py-3
+            <button
+              type="button"
+              onClick={
+                handleExport
+              }
+              aria-label="Export JSON"
+              className={secondaryButton}
+            >
+              <FileOutput
+                size={18}
+                aria-hidden
+              />
 
-              rounded-2xl
-
-              border
-              border-[var(--border-color)]
-
-              bg-[var(--bg-secondary)]
-
-              text-[var(--text-primary)]
-              text-sm
-              font-medium
-
-              hover:bg-[var(--hover-bg)]
-
-              transition-all
-              duration-300
-            "
-          >
-            <Printer
-              size={16}
-            />
-
-            Print
-          </button>
-
-          {/* EXPORT */}
-
-          <button
-            onClick={
-              handleExport
-            }
-            className="
-              flex
-              items-center
-              gap-2
-
-              px-5
-              py-3
-
-              rounded-2xl
-
-              border
-              border-[var(--border-color)]
-
-              bg-[var(--bg-secondary)]
-
-              text-[var(--text-primary)]
-              text-sm
-              font-medium
-
-              hover:bg-[var(--hover-bg)]
-
-              transition-all
-              duration-300
-            "
-          >
-            <FileOutput
-              size={16}
-            />
-
-            Export JSON
-          </button>
+              Export
+            </button>
+          </div>
         </div>
       </div>
     </div>

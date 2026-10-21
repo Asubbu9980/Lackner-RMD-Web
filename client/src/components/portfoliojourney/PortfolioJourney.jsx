@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/rules-of-hooks */
 
 import { useMemo, useState } from "react";
 
@@ -37,19 +36,25 @@ const edgeTypes = {
     journey: JourneyEdge,
 };
 
-export default function PortfolioJourney({
-    rows = [],
-}) {
+// hooks can't run after an early return, so the empty case is handled here
+export default function PortfolioJourney({ rows = [] }) {
+    if (!rows.length) return null;
+
+    return <JourneyView rows={rows} />;
+}
+
+function JourneyView({ rows }) {
     const theme = useTheme();
 
     const isDark =
         theme.palette.mode === "dark";
 
-    if (!rows.length) return null;
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
-   const [selectedIndex, setSelectedIndex] = useState(0);
+    // a recalculation can return fewer years than the slider was on
+    const index = Math.min(selectedIndex, rows.length - 1);
 
-const r = rows[selectedIndex];
+    const r = rows[index];
 
     const afterGrowth =
         r.beginBalance + r.growth;
@@ -374,7 +379,7 @@ const r = rows[selectedIndex];
     </Box>
 
     <Slider
-      value={selectedIndex}
+      value={index}
       min={0}
       max={rows.length - 1}
       step={1}

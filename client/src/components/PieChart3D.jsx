@@ -49,7 +49,8 @@ const OrbitalSlice = ({ startAngle, endAngle, color, label, value, index, onHove
   );
 };
 
-const PieChart3D = ({ data }) => {
+// showLegend: false when the page shows its own legend (it covers the pie)
+const PieChart3D = ({ data, showLegend = true }) => {
   const [hoveredData, setHoveredData] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -89,8 +90,10 @@ const PieChart3D = ({ data }) => {
                 <meshStandardMaterial color="#00f2ff" emissive="#00f2ff" emissiveIntensity={4} metalness={1} roughness={0} />
              </mesh>
           </Float>
+          {/* slices lie flat via rotation -90° about X, which maps shape y → world -z,
+              so labels use -sin to sit beside their own slice */}
           {slices.map((slice, i) => (
-            <Text key={`label-${i}`} position={[Math.cos(slice.startAngle + (slice.endAngle - slice.startAngle) / 2) * 6.5, 1, Math.sin(slice.startAngle + (slice.endAngle - slice.startAngle) / 2) * 6.5]} fontSize={0.4} color="#fff" fontWeight="800">
+            <Text key={`label-${i}`} position={[Math.cos(slice.startAngle + (slice.endAngle - slice.startAngle) / 2) * 6.5, 1, -Math.sin(slice.startAngle + (slice.endAngle - slice.startAngle) / 2) * 6.5]} fontSize={0.4} color="#fff" fontWeight="800">
               {slice.label}
             </Text>
           ))}
@@ -104,7 +107,7 @@ const PieChart3D = ({ data }) => {
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
         <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
-      <CinematicLegend items={legendItems} />
+      {showLegend && <CinematicLegend items={legendItems} />}
     </div>
   );
 };

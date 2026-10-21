@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     if (email === "admin@test.com" && password === "admin123") {
-      navigate("/dashboard");
+      navigate("/dashboard/classic");
     } else {
       setError("Invalid email or password");
     }

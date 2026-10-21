@@ -23,6 +23,10 @@ export const RmdProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // the inputs the current result (or error) belongs to; while they differ
+  // from `inputs`, a recalculation is pending (debounce + request)
+  const [settledInputs, setSettledInputs] = useState(null);
+
   const updateInput = useCallback((name, value) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -30,26 +34,40 @@ export const RmdProvider = ({ children }) => {
   const resetInputs = useCallback(() => setInputs(DEFAULT_INPUTS), []);
 
   useEffect(() => {
+    // a newer change supersedes this request, so a slow stale response
+    // can't overwrite the latest result
+    let stale = false;
+
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
         const res = await calculateRmd(inputs);
+        if (stale) return;
         setResult(res.result);
         setError(null);
       } catch (err) {
+        if (stale) return;
         console.error(err);
         setError("Couldn't reach the calculation server. Showing the last successful result.");
       } finally {
-        setLoading(false);
+        if (!stale) {
+          setLoading(false);
+          setSettledInputs(inputs);
+        }
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
   }, [inputs]);
+
+  const calculating = settledInputs !== inputs;
 
   return (
     <RmdContext.Provider
-      value={{ inputs, setInputs, updateInput, resetInputs, result, loading, error }}
+      value={{ inputs, setInputs, updateInput, resetInputs, result, loading, calculating, error }}
     >
       {children}
     </RmdContext.Provider>

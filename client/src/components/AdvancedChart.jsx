@@ -79,7 +79,9 @@ const AdvancedChart = () => {
     year: r.year,
     age: r.age,
 
+    beginBalance: r.beginBalance,
     balance: r.endBalance || 0,
+    endBalance: r.endBalance || 0,
     growth: r.growth || 0,
     rmd: r.rmd || 0,
     tax: r.tax || 0,
@@ -115,6 +117,16 @@ const AdvancedChart = () => {
           ? 480
           : 340;
 
+  // phones get shorter plots (a 500px 3D canvas fills a whole phone screen);
+  // the 3D pie puts its legend under the chart, so it sizes to content
+  const stackedPie = view === "pie" && chartMode === "3d";
+
+  const heightSx = {
+    xs: stackedPie ? "auto" : Math.min(containerHeight, 360),
+    sm: stackedPie ? "auto" : Math.min(containerHeight, 420),
+    md: stackedPie ? "auto" : containerHeight,
+  };
+
   return (
     <Card
       sx={{
@@ -137,7 +149,7 @@ const AdvancedChart = () => {
           : "0 4px 18px rgba(15,23,42,0.08)",
       }}
     >
-      <CardContent sx={{ p: 2 }}>
+      <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
         {/* =====================================================
             HEADER
         ===================================================== */}
@@ -145,8 +157,11 @@ const AdvancedChart = () => {
         <Box
           sx={{
             display: "flex",
+            // stacks when the chart column is narrow (phones, and lg where the inputs sit beside it)
+            flexDirection: { xs: "column", md: "row", lg: "column", xl: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", md: "center", lg: "stretch", xl: "center" },
+            gap: 1.5,
 
             mb: 1.8,
 
@@ -189,9 +204,9 @@ const AdvancedChart = () => {
               sx={{
                 mt: 0.3,
 
-                fontSize: 12,
+                fontSize: "max(12px, 0.875rem)",
 
-                color: isDark ? "rgba(255,255,255,0.62)" : "#64748b",
+                color: isDark ? "rgba(255,255,255,0.72)" : "#475569",
               }}
             >
               Interactive Wealth Visualization
@@ -205,7 +220,8 @@ const AdvancedChart = () => {
               display: "flex",
               flexDirection: "column",
               gap: 1,
-              alignItems: "flex-end",
+              minWidth: 0,
+              alignItems: { xs: "flex-start", md: "flex-end", lg: "flex-start", xl: "flex-end" },
             }}
           >
             {/* =========================
@@ -223,6 +239,12 @@ const AdvancedChart = () => {
               size="small"
               sx={{
                 gap: 0.5,
+
+                // keep every pill fully rounded, even when the row wraps
+                "& .MuiToggleButtonGroup-grouped": {
+                  borderRadius: "10px !important",
+                  ml: "0 !important",
+                },
 
                 background: isDark
                   ? "rgba(255,255,255,0.04)"
@@ -243,6 +265,9 @@ const AdvancedChart = () => {
                   border: "none !important",
                   borderRadius: "10px",
                   textTransform: "none",
+                  fontWeight: 700,
+                  minWidth: 52,
+                  minHeight: { xs: 40, md: "auto" },
 
                   "&.Mui-selected": {
                     color: "#ffffff",
@@ -260,6 +285,9 @@ const AdvancedChart = () => {
                   border: "none !important",
                   borderRadius: "10px",
                   textTransform: "none",
+                  fontWeight: 700,
+                  minWidth: 52,
+                  minHeight: { xs: 40, md: "auto" },
 
                   "&.Mui-selected": {
                     color: "#ffffff",
@@ -283,6 +311,17 @@ const AdvancedChart = () => {
               size="small"
               sx={{
                 gap: 0.5,
+
+                // keep every pill fully rounded, even when the row wraps
+                "& .MuiToggleButtonGroup-grouped": {
+                  borderRadius: "10px !important",
+                  ml: "0 !important",
+                },
+
+                // wraps into rows on narrow screens instead of overflowing
+                flexWrap: "wrap",
+                justifyContent: { xs: "flex-start", md: "flex-end", lg: "flex-start", xl: "flex-end" },
+                maxWidth: "100%",
 
                 background: isDark
                   ? "rgba(255,255,255,0.04)"
@@ -333,6 +372,7 @@ const AdvancedChart = () => {
                   sx={{
                     px: 1.5,
                     py: 0.6,
+                    minHeight: { xs: 40, md: "auto" },
 
                     border: "none !important",
 
@@ -342,9 +382,9 @@ const AdvancedChart = () => {
 
                     fontWeight: 700,
 
-                    fontSize: "12px",
+                    fontSize: { xs: "0.875rem", md: "12px" },
 
-                    color: isDark ? "rgba(255,255,255,0.75)" : "#475569",
+                    color: isDark ? "rgba(255,255,255,0.8)" : "#475569",
 
                     transition: "all 0.25s ease",
 
@@ -372,7 +412,11 @@ const AdvancedChart = () => {
           key={`${chartMode}-${view}`}
           sx={{
             width: "100%",
-            height: containerHeight,
+            minWidth: 0,
+            // the box's width never depends on its content, so a 3D canvas
+            // can't push the card wider (canvas → resize → wider → …)
+            contain: "inline-size",
+            height: heightSx,
 
             transition: "height 0.35s ease",
           }}
@@ -499,41 +543,40 @@ const AdvancedChart = () => {
              
 
               {view === "pie" && (
+                // full-width pie, legend cards in a row underneath
                 <Box
                   sx={{
                     width: "100%",
-                    height: "100%",
 
                     display: "flex",
 
-                    alignItems: "center",
-
-                    justifyContent: "space-between",
+                    flexDirection: "column",
 
                     gap: 1.5,
                   }}
                 >
-                 
-
+                  {/* minWidth 0 + clipped: the canvas's own width can't
+                      feed back into this box and grow it without end */}
                   <Box
                     sx={{
-                      flex: 1.5,
-                      height: "100%",
-                      minHeight: 280,
+                      width: "100%",
+                      minWidth: 0,
+                      position: "relative",
+                      overflow: "hidden",
+                      height: { xs: 300, sm: 380, md: 440 },
                     }}
                   >
-                    <PieChart3D data={pieData} />
+                    <PieChart3D data={pieData} showLegend={false} />
                   </Box>
-
-                  
 
                   <Box
                     sx={{
-                      flex: 1,
+                      display: "grid",
 
-                      display: "flex",
-
-                      flexDirection: "column",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(auto-fit, minmax(180px, 1fr))",
+                      },
 
                       gap: 1.2,
                     }}
@@ -586,7 +629,7 @@ const AdvancedChart = () => {
                           >
                             
 
-                            <Box display="flex" alignItems="center" gap={1}>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                               <Box
                                 sx={{
                                   width: 9,
@@ -616,7 +659,7 @@ const AdvancedChart = () => {
 
                             
 
-                            <Box textAlign="right">
+                            <Box sx={{ textAlign: "right" }}>
                               <Typography
                                 sx={{
                                   color: isDark ? "#ffffff" : "#111827",
@@ -635,7 +678,7 @@ const AdvancedChart = () => {
                                     ? "rgba(255,255,255,0.72)"
                                     : "rgba(17,24,39,0.65)",
 
-                                  fontSize: 11,
+                                  fontSize: 12,
 
                                   mt: 0.2,
                                 }}

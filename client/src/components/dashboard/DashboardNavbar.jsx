@@ -1,5 +1,7 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+
+import TopLoader from "./TopLoader";
 
 import {
   Menu,
@@ -15,6 +17,7 @@ import {
   TextField,
   Tooltip,
   IconButton,
+  useMediaQuery,
 } from "@mui/material";
 
 import {
@@ -22,13 +25,8 @@ import {
   Compass,
   Sun,
   Moon,
-  Ellipsis,
   Save,
   FolderOpen,
-  Upload,
-  FileJson,
-  FileSpreadsheet,
-  Printer,
   RotateCcw,
   Trash2,
   History,
@@ -62,19 +60,21 @@ const LAYOUTS = [
   },
 ];
 
-export const LayoutTabs = () => (
+// fill: equal-width segments across the row (phones/tablets, below the header)
+export const LayoutTabs = ({ fill = false }) => (
   <nav
     aria-label="Dashboard layouts"
-    className="
+    className={`
       flex
       items-center
       gap-1
       p-1
-      rounded-xl
+      rounded-2xl
       border
       border-[var(--border-color)]
       bg-[var(--hover-bg)]
-    "
+      ${fill ? "w-full sm:w-auto" : ""}
+    `}
   >
     {/* native title, not MUI Tooltip — Tooltip overwrites NavLink's className function */}
     {LAYOUTS.map(({ to, label, description, icon: Icon }) => (
@@ -85,24 +85,30 @@ export const LayoutTabs = () => (
         title={description}
         className={({ isActive }) => `
           flex
+          min-h-[2.75rem]
           items-center
+          justify-center
           gap-2
-          rounded-lg
-          px-3
+          rounded-xl
+          px-2
           sm:px-4
-          py-2
+          py-1.5
           text-sm
           font-semibold
-          transition-all
+          transition-[background-color,color,box-shadow]
           duration-200
+          hover:transform-none
+          ${fill ? "flex-1 sm:flex-none" : ""}
           ${
+            // same active look as the engine toggle (Segmented)
             isActive
-              ? "bg-[var(--bg-secondary)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] ring-1 ring-purple-400/30"
-              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-[0_4px_14px_rgba(124,58,237,0.35)]"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]"
           }
         `}
       >
-        <Icon size={16} />
+        {/* icons drop on phones so all three labels fit at a readable size */}
+        <Icon size={16} className={`shrink-0 ${fill ? "hidden min-[440px]:block" : ""}`} />
         {label}
       </NavLink>
     ))}
@@ -126,6 +132,8 @@ const StatusPill = () => {
       className="
         hidden
         md:flex
+        xl:hidden
+        2xl:flex
         items-center
         gap-2
         rounded-full
@@ -133,12 +141,12 @@ const StatusPill = () => {
         border-[var(--border-color)]
         px-3
         py-1.5
-        text-xs
+        text-sm
         font-semibold
         text-[var(--text-secondary)]
       "
     >
-      <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
+      <span className={`h-2.5 w-2.5 rounded-full ${styles.dot}`} />
       {styles.text}
     </div>
   );
@@ -190,9 +198,6 @@ const ActionsMenu = () => {
 
   const [anchor, setAnchor] = useState(null);
   const [saveOpen, setSaveOpen] = useState(false);
-  const [importError, setImportError] = useState("");
-
-  const fileRef = useRef(null);
 
   const close = () => setAnchor(null);
 
@@ -201,51 +206,38 @@ const ActionsMenu = () => {
     fn();
   };
 
-  const openFilePicker = () => {
-    close();
-    fileRef.current?.click();
-  };
-
-  const onImport = async (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-
-    try {
-      await actions.importJson(file);
-      setImportError("");
-    } catch {
-      setImportError("That file isn't a valid RMD inputs export.");
-    }
-  };
-
   return (
     <>
-      <Tooltip title="Save, load, import, export, print" describeChild>
+      {/* one Save button: opens the menu with save, saved scenarios and reset */}
+      <Tooltip title="Save, load or reset scenarios" describeChild>
         <button
           type="button"
           onClick={(e) => setAnchor(e.currentTarget)}
           aria-haspopup="menu"
+          aria-label="Save"
           className="
             flex
+            h-11
+            min-w-[2.75rem]
             items-center
+            justify-center
             gap-2
             rounded-xl
             border
-            border-[var(--border-color)]
-            bg-[var(--bg-secondary)]
+            border-purple-400/50
+            bg-purple-500/10
             px-3
-            py-2
             text-sm
             font-semibold
-            text-[var(--text-primary)]
-            hover:bg-[var(--hover-bg)]
+            text-purple-700
+            hover:bg-purple-500/20
+            dark:text-purple-200
           "
         >
-          <Ellipsis size={16} />
-          <span className="hidden sm:inline">Actions</span>
+          <Save size={18} />
+          <span className="hidden sm:inline xl:hidden 2xl:inline">Save</span>
           {actions.saved.length > 0 && (
-            <span className="rounded-full bg-purple-500 px-1.5 text-[10px] font-bold text-white">
+            <span className="rounded-full bg-purple-600 px-1.5 text-xs font-bold text-white">
               {actions.saved.length}
             </span>
           )}
@@ -258,7 +250,20 @@ const ActionsMenu = () => {
         onClose={close}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
-        slotProps={{ paper: { sx: { minWidth: 260, borderRadius: 3, mt: 1 } } }}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 260,
+              maxWidth: "calc(100vw - 24px)",
+              borderRadius: 3,
+              mt: 1,
+              // roomy rows for touch and older eyes
+              "& .MuiMenuItem-root": { minHeight: 48, py: 1 },
+              "& .MuiListItemText-primary": { fontSize: "1rem", fontWeight: 600 },
+              "& .MuiListItemText-secondary": { fontSize: "0.875rem" },
+            },
+          },
+        }}
       >
         <MenuItem onClick={run(() => setSaveOpen(true))}>
           <ListItemIcon><Save size={16} /></ListItemIcon>
@@ -278,6 +283,7 @@ const ActionsMenu = () => {
             <IconButton
               size="small"
               aria-label={`Delete ${s.name}`}
+              sx={{ width: 40, height: 40 }}
               onClick={(e) => {
                 e.stopPropagation();
                 actions.removeSaved(s.id);
@@ -290,35 +296,11 @@ const ActionsMenu = () => {
 
         <Divider />
 
-        <MenuItem onClick={openFilePicker}>
-          <ListItemIcon><Upload size={16} /></ListItemIcon>
-          <ListItemText primary="Import inputs (JSON)" />
-        </MenuItem>
-
-        <MenuItem onClick={run(actions.exportJson)}>
-          <ListItemIcon><FileJson size={16} /></ListItemIcon>
-          <ListItemText primary="Export inputs (JSON)" />
-        </MenuItem>
-
-        <MenuItem onClick={run(actions.exportCsv)} disabled={!actions.canExportCsv}>
-          <ListItemIcon><FileSpreadsheet size={16} /></ListItemIcon>
-          <ListItemText primary="Export projection (CSV)" />
-        </MenuItem>
-
-        <MenuItem onClick={run(actions.print)}>
-          <ListItemIcon><Printer size={16} /></ListItemIcon>
-          <ListItemText primary="Print report" />
-        </MenuItem>
-
-        <Divider />
-
         <MenuItem onClick={run(actions.reset)}>
           <ListItemIcon><RotateCcw size={16} /></ListItemIcon>
           <ListItemText primary="Reset to defaults" />
         </MenuItem>
       </Menu>
-
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onImport} />
 
       <SaveDialog
         open={saveOpen}
@@ -326,16 +308,6 @@ const ActionsMenu = () => {
         onSave={actions.saveCurrent}
         defaultName={describeInputs(inputs)}
       />
-
-      {importError && (
-        <div
-          role="alert"
-          className="fixed bottom-4 right-4 z-50 rounded-xl bg-rose-600 px-4 py-2.5 text-sm text-white shadow-lg"
-          onClick={() => setImportError("")}
-        >
-          {importError}
-        </div>
-      )}
     </>
   );
 };
@@ -347,9 +319,9 @@ const FontSizeControl = ({ fontScale }) => {
   const stepClass = `
     flex
     h-full
+    w-11
     items-center
     justify-center
-    px-2.5
     text-[var(--text-primary)]
     hover:bg-[var(--hover-bg)]
     hover:transform-none
@@ -364,7 +336,7 @@ const FontSizeControl = ({ fontScale }) => {
       aria-label="Text size"
       className="
         flex
-        h-9
+        h-11
         items-center
         overflow-hidden
         rounded-xl
@@ -381,7 +353,7 @@ const FontSizeControl = ({ fontScale }) => {
         title="Smaller text"
         className={stepClass}
       >
-        <AArrowDown size={17} />
+        <AArrowDown size={19} />
       </button>
 
       <button
@@ -391,11 +363,11 @@ const FontSizeControl = ({ fontScale }) => {
         aria-label={`Text size ${percent}%, reset`}
         className="
           h-full
-          min-w-[50px]
+          min-w-[3.25rem]
           border-x
           border-[var(--border-color)]
           px-1
-          text-xs
+          text-sm
           font-bold
           tabular-nums
           text-[var(--text-primary)]
@@ -414,7 +386,7 @@ const FontSizeControl = ({ fontScale }) => {
         title="Larger text"
         className={stepClass}
       >
-        <AArrowUp size={19} />
+        <AArrowUp size={21} />
       </button>
     </div>
   );
@@ -425,107 +397,132 @@ const DashboardNavbar = ({ fontScale }) => {
 
   const isDark = mode === "dark";
 
+  // Wide screens: one row. Phones/tablets: a compact sticky row (brand + the
+  // controls readers need most), with the layout switcher as a full-width row
+  // below it that scrolls away — keeps the sticky bar short on small screens.
+  const wide = useMediaQuery("(min-width: 1280px)", { noSsr: true });
+
   return (
-    <header
-      className="
-        sticky
-        top-0
-        z-40
-        border-b
-        border-[var(--border-color)]
-        bg-[var(--glass-bg)]
-        backdrop-blur-2xl
-        print:hidden
-      "
-    >
-      <div
+    <>
+      <header
         className="
-          mx-auto
-          flex
-          max-w-[1800px]
-          flex-wrap
-          items-center
-          gap-x-4
-          gap-y-2
-          px-3
-          py-2.5
-          lg:px-5
+          sticky
+          top-0
+          z-40
+          border-b
+          border-[var(--border-color)]
+          bg-[var(--glass-bg)]
+          backdrop-blur-2xl
+          print:hidden
         "
       >
-        {/* BRAND */}
-        <NavLink to="/" className="flex h-10 shrink-0 items-center gap-3">
-          <span
-            className="
-              flex
-              h-full
-              items-center
-              rounded-xl
-              border
-              px-3
-            "
-            style={{
-              background: isDark ? "rgba(255,255,255,0.96)" : "#ffffff",
-              borderColor: isDark ? "rgba(255,255,255,0.12)" : "var(--border-color)",
-            }}
+        <TopLoader />
+
+        <div
+          className="
+            mx-auto
+            flex
+            max-w-[1800px]
+            items-center
+            gap-3
+            px-4
+            py-2
+            sm:px-5
+            lg:gap-4
+          "
+        >
+          {/* BRAND */}
+          <NavLink
+            to="/"
+            aria-label="Leimberg LeClair Lackner — home"
+            className="flex h-11 min-w-0 shrink items-center gap-3 rounded-xl"
           >
-            <img
-              src="/LeimbergLeClairLackner_logo.png"
-              alt="Leimberg LeClair Lackner"
-              className="block h-5 w-auto object-contain sm:h-6"
-            />
-          </span>
-
-          <span aria-hidden className="hidden h-7 w-px bg-[var(--border-color)] xl:block" />
-
-          <span className="hidden flex-col justify-center xl:flex">
-            <span className="text-sm font-black leading-5 tracking-tight text-[var(--text-primary)]">
-              RMD Calculator
-            </span>
-            <span className="text-[11px] leading-4 text-[var(--text-secondary)]">
-              Leimberg Financial Intelligence
-            </span>
-          </span>
-        </NavLink>
-
-        {/* LAYOUTS */}
-        <div className="order-last w-full sm:order-none sm:w-auto sm:flex-1 flex justify-center">
-          <LayoutTabs />
-        </div>
-
-        {/* RIGHT */}
-        <div className="ml-auto flex items-center gap-2 sm:ml-0">
-          <StatusPill />
-
-          <EngineToggle className="hidden w-[250px] lg:block" />
-
-          <FontSizeControl fontScale={fontScale} />
-
-          <ActionsMenu />
-
-          <Tooltip title={isDark ? "Light mode" : "Dark mode"}>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
+            <span
               className="
                 flex
-                h-9
-                w-9
+                h-full
+                min-w-0
                 items-center
-                justify-center
                 rounded-xl
                 border
-                border-[var(--border-color)]
-                bg-[var(--bg-secondary)]
-                hover:bg-[var(--hover-bg)]
+                px-2.5
+                sm:px-3
               "
+              style={{
+                background: isDark ? "rgba(255,255,255,0.96)" : "#ffffff",
+                borderColor: isDark ? "rgba(255,255,255,0.12)" : "var(--border-color)",
+              }}
             >
-              {isDark ? <Sun size={16} className="text-yellow-300" /> : <Moon size={16} className="text-slate-700" />}
-            </button>
-          </Tooltip>
+              {/* the 12:1 wordmark is unreadable at phone widths — use the mark there */}
+              <img
+                src="/lackner.png"
+                alt=""
+                className="block h-7 w-auto object-contain sm:hidden"
+              />
+              <img
+                src="/LeimbergLeClairLackner_logo.png"
+                alt=""
+                className="hidden h-5 w-auto max-w-full object-contain sm:block 2xl:h-6"
+              />
+            </span>
+
+            <span className="hidden min-w-0 flex-col justify-center min-[480px]:flex sm:hidden">
+              <span className="truncate text-base font-black leading-5 tracking-tight text-[var(--text-primary)]">
+                RMD Calculator
+              </span>
+            </span>
+          </NavLink>
+
+          {/* LAYOUTS — inline on wide screens */}
+          {wide && (
+            <div className="flex min-w-0 flex-1 justify-center">
+              <LayoutTabs />
+            </div>
+          )}
+
+          {/* RIGHT */}
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <StatusPill />
+
+            <EngineToggle className="hidden w-[250px] lg:block" />
+
+            <FontSizeControl fontScale={fontScale} />
+
+            <ActionsMenu />
+
+            <Tooltip title={isDark ? "Light mode" : "Dark mode"}>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="
+                  flex
+                  h-11
+                  w-11
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border
+                  border-[var(--border-color)]
+                  bg-[var(--bg-secondary)]
+                  hover:bg-[var(--hover-bg)]
+                "
+              >
+                {isDark ? <Sun size={19} className="text-yellow-300" /> : <Moon size={19} className="text-slate-700" />}
+              </button>
+            </Tooltip>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* LAYOUTS — own row on phones/tablets */}
+      {!wide && (
+        <div className="relative z-30 mx-auto flex max-w-[1800px] justify-center px-4 pt-3 sm:px-5 print:hidden">
+          <LayoutTabs fill />
+        </div>
+      )}
+    </>
   );
 };
 

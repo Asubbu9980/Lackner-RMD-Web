@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 import React, { useMemo, useState, useRef, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Html, Text, Float, Line } from "@react-three/drei";
 import * as THREE from "three";
 import useRmd from "../hooks/useRmd";
@@ -162,9 +162,37 @@ const WaterfallBar = ({ row, maxVal, width, index, onHover }) => {
   );
 };
 
-const CascadeFlow3D = ({ mode = "PROJECTION" }) => {
+// ======================================================
+// SHOWCASE SWAY — camera-free gentle rotation for non-interactive use
+// (no OrbitControls, so touch scrolling over the canvas keeps working)
+// ======================================================
+
+const SwayGroup = ({ children, amount = 0.6, speed = 0.18 }) => {
+  const ref = useRef();
+  useFrame((state) => {
+    if (ref.current) ref.current.rotation.y = Math.sin(state.clock.elapsedTime * speed) * amount;
+  });
+  return <group ref={ref}>{children}</group>;
+};
+
+// Without OrbitControls: back the camera off until the whole curve fits the
+// canvas's shape (narrow phone cards need more distance), aimed at the origin
+const FitCamera = () => {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const aspect = size.width / Math.max(size.height, 1);
+    const distance = THREE.MathUtils.clamp(29 / aspect, 21, 36);
+    camera.position.set(0, distance * 0.26, distance);
+    camera.lookAt(0, 0, 0);
+  }, [camera, size.width, size.height]);
+  return null;
+};
+
+// rows: optional sample data instead of the live calculation (home page)
+// interactive: false → no drag/zoom controls, scene sways on its own
+const CascadeFlow3D = ({ mode = "PROJECTION", rows, showLegend = true, interactive = true, frameloop }) => {
   const { result } = useRmd();
-  const data = useMemo(() => result?.rows || [], [result]);
+  const data = useMemo(() => rows || result?.rows || [], [rows, result]);
   const [hoveredData, setHoveredData] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -181,16 +209,18 @@ const CascadeFlow3D = ({ mode = "PROJECTION" }) => {
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative", background: "#010409" }}>
-      <CinematicCanvas cameraPos={mode === "WATERFALL" ? [12, 5, 20] : [0, 5, 20]} onMouseMove={handleMouseMove}>
-        <CinematicCamera orbitSpeed={0.3} driftAmount={0} />
-        <group position={[0, mode === "WATERFALL" ? 8 : -3, 0]}>
-          <gridHelper args={[80, 40, "#1e293b", "#0f172a"]} rotation={[mode === "WATERFALL" ? Math.PI/2 : 0, 0, 0]} opacity={0.2} transparent />
-          {mode === "PROJECTION" ? (
-             <ProjectionScene data={data} maxBalance={Math.max(...data.map(d => d.endBalance || 0), 1)} width={20} amplitude={7} onHover={setHoveredData} />
-          ) : (
-             <group>{data.map((row, i) => <WaterfallBar key={i} row={row} maxVal={Math.max(...data.map(d => d.endBalance || 0), 1) * 1.1} width={20} index={i} onHover={setHoveredData} />)}</group>
-          )}
-        </group>
+      <CinematicCanvas cameraPos={mode === "WATERFALL" ? [12, 5, 20] : [0, 5, 20]} onMouseMove={handleMouseMove} frameloop={frameloop}>
+        {interactive ? <CinematicCamera orbitSpeed={0.3} driftAmount={0} /> : <FitCamera />}
+        <SwayGroup amount={interactive ? 0 : 0.6}>
+          <group position={[0, mode === "WATERFALL" ? 8 : -3, 0]}>
+            <gridHelper args={[80, 40, "#1e293b", "#0f172a"]} rotation={[mode === "WATERFALL" ? Math.PI/2 : 0, 0, 0]} opacity={0.2} transparent />
+            {mode === "PROJECTION" ? (
+               <ProjectionScene data={data} maxBalance={Math.max(...data.map(d => d.endBalance || 0), 1)} width={20} amplitude={7} onHover={setHoveredData} />
+            ) : (
+               <group>{data.map((row, i) => <WaterfallBar key={i} row={row} maxVal={Math.max(...data.map(d => d.endBalance || 0), 1) * 1.1} width={20} index={i} onHover={setHoveredData} />)}</group>
+            )}
+          </group>
+        </SwayGroup>
       </CinematicCanvas>
       
       {hoveredData && (
@@ -209,7 +239,7 @@ const CascadeFlow3D = ({ mode = "PROJECTION" }) => {
       <div style={{ position: "absolute", top: "40px", left: "40px", pointerEvents: "none" }}>
         <CinematicLabel  fontSize="28px" color="#fff" />
       </div>
-      <CinematicLegend items={legendItems} />
+      {showLegend && <CinematicLegend items={legendItems} />}
     </div>
   );
 };

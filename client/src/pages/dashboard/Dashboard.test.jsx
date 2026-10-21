@@ -72,7 +72,7 @@ describe("dashboard layouts", () => {
     expect(within(nav).getByRole("link", { name: /Classic/ })).toHaveAttribute("aria-current", "page");
 
     // shared navbar on top, original form, summary cards and charts below
-    expect(screen.getByRole("button", { name: /Actions/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Save$/ })).toBeInTheDocument();
     expect(screen.getByText("Input Parameters")).toBeInTheDocument();
     expect(await screen.findByText("Total RMDs")).toBeInTheDocument();
     expect(screen.getByText("classic-projection")).toBeInTheDocument();

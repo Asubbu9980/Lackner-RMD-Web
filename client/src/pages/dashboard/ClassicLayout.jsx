@@ -1,5 +1,5 @@
-/* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useRenderMode } from "../../context/RenderModeContext";
 import useRmd from "../../hooks/useRmd";
 
@@ -10,27 +10,93 @@ import AdvancedChart from "../../components/AdvancedChart";
 import DataTable from "../../components/DataTable";
 
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { EngineToggle } from "../../components/dashboard/InputSections";
+import CinematicPanel from "../../components/dashboard/CinematicPanel";
+
+import { scrollToSection } from "../../utils/scroll";
 
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from "@mui/material";
+  Activity,
+  Waves,
+  Table2,
+  BadgeDollarSign,
+  ArrowDown,
+} from "lucide-react";
 
-import { generateProjection } from "../../services/pythonapi";
+// Icon + plain-language heading used by every results section. Headings are
+// focusable (tabIndex -1) so "Calculate" can hand screen-reader focus to them.
+const SectionHeading = ({ icon: Icon, accent, glow, title, subtitle, headingRef }) => (
+  <div
+    className="
+      flex
+      items-center
+      gap-3
+    "
+  >
+    <div
+      className={`
+        w-11
+        h-11
+        shrink-0
 
-import { Activity, Waves, Table2 } from "lucide-react";
+        rounded-2xl
+
+        flex
+        items-center
+        justify-center
+
+        bg-gradient-to-br
+        ${accent}
+
+        ${glow}
+      `}
+    >
+      <Icon size={20} className="text-white" />
+    </div>
+
+    <div className="min-w-0">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="
+          text-xl
+          xl:text-2xl
+
+          leading-tight
+          font-black
+          tracking-tight
+
+          text-[var(--text-primary)]
+        "
+      >
+        {title}
+      </h2>
+
+      <p
+        className="
+          mt-0.5
+
+          text-sm
+          sm:text-base
+
+          text-[var(--text-secondary)]
+        "
+      >
+        {subtitle}
+      </p>
+    </div>
+  </div>
+);
 
 // The original dashboard the client likes, rendered inside the shared
 // dashboard shell (navbar) like the other layouts. Inputs stay sticky on the
-// left; the summary cards sit at the top of the analytics column.
+// left on wide screens and stack above the results on phones/tablets; the
+// summary cards sit at the top of the analytics column.
 const ClassicLayout = () => {
   // =====================================================
   // DISPLAY STATES
   // =====================================================
-  const { inputs } = useRmd();
+  const { result } = useRmd();
 
   const [showChart, setShowChart] = useState(true);
 
@@ -41,98 +107,68 @@ const ClassicLayout = () => {
   const [showTax, setShowTax] = useState(true);
   const { renderMode } = useRenderMode();
 
-  const [videoUrl, setVideoUrl] = useState("");
+  // Manim render state is shared with Workspace/Planner via the shell
+  const { cinematic } = useOutletContext();
 
-  const [isRendering, setIsRendering] = useState(false);
+  // =====================================================
+  // CALCULATE → SCROLL TO RESULTS
+  // Results recalculate live (RmdContext); the Calculate
+  // buttons take the reader to the graphs.
+  // =====================================================
+  const resultsRef = useRef(null);
+  const resultsHeadingRef = useRef(null);
 
-  const [renderProgress, setRenderProgress] = useState(0);
+  const chartsRef = useRef(null);
+  const chartsHeadingRef = useRef(null);
 
-  const [renderStage, setRenderStage] = useState("");
+  const calculateRef = useRef(null);
 
-  const [sceneDialogOpen, setSceneDialogOpen] = useState(false);
+  const [showJumpBar, setShowJumpBar] = useState(false);
 
-  const [sceneType, setSceneType] = useState("projection");
-
-  const generateCinematic = async (selectedScene) => {
-    try {
-      const deathRequiredScenarios = [
-        "DECEASED_SPOUSE_INHERIT",
-
-        "DECEASED_EDB_SINGLELIFE",
-
-        "DECEASED_10YEAR",
-
-        "DECEASED_10YEAR_ANNUAL",
-      ];
-
-      if (
-        deathRequiredScenarios.includes(inputs.scenario) &&
-        !inputs.date_Death_Owner
-      ) {
-        alert("Date of Death is required for this scenario.");
-
-        return;
-      }
-      setIsRendering(true);
-      setRenderProgress(0);
-      setRenderStage("Starting render...");
-
-      const payload = {
-        balance_Start: Number(inputs.balance_Start),
-
-        growth_Rate: Number(inputs.growth_Rate),
-
-        tax_Rate: Number(inputs.tax_Rate),
-
-        year_Birth_Owner: Number(inputs.year_Birth_Owner),
-
-        year_Birth_Beny: Number(inputs.year_Birth_Beny),
-
-        date_Death_Owner: inputs.date_Death_Owner,
-
-        scenario: inputs.scenario,
-
-        plan: inputs.plan,
-      };
-      console.log(payload);
-
-      const response = await generateProjection(
-        inputs.scenario,
-        payload,
-        selectedScene,
-        ({ progress, stage }) => {
-          setRenderProgress(progress);
-          setRenderStage(stage);
-        },
-      );
-
-     const fullVideoUrl = `https://lackner-rmd.vercel.app/api${response.video_url}`;
-      // const fullVideoUrl = `https://python-backend-rmd.onrender.com${response.video_url}`;
-
-      setVideoUrl(fullVideoUrl);
-
-      console.log(inputs.scenario);
-      console.log(typeof inputs.scenario);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsRendering(false);
+  const scrollToResults = () => {
+    if (showChart && chartsRef.current) {
+      scrollToSection(chartsRef.current, chartsHeadingRef.current);
+    } else {
+      scrollToSection(resultsRef.current, resultsHeadingRef.current);
     }
   };
+
+  // Phones/tablets: a sticky "Calculate" bar while the reader is in the form,
+  // hidden once the form's own button or the results are on screen.
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const seen = new Map();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => seen.set(e.target, e.isIntersecting));
+        setShowJumpBar(![...seen.values()].some(Boolean));
+      },
+      // ignore the strip the bar itself covers
+      { rootMargin: "0px 0px -96px 0px" },
+    );
+
+    [calculateRef.current, resultsRef.current].forEach((el) => el && observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div>
       {/* =============================================
           GRID — sticky inputs left, analytics right
+          (stacked below lg)
       ============================================= */}
 
       <div
         className="
           grid
 
-          md:grid-cols-[380px_minmax(0,1fr)]
+          lg:grid-cols-[380px_minmax(0,1fr)]
 
-          gap-4
+          gap-6
+          lg:gap-4
           xl:gap-5
 
           items-start
@@ -147,10 +183,11 @@ const ClassicLayout = () => {
                 self-start
                 min-w-0
 
-                md:sticky
-                md:top-[76px]
-                md:max-h-[calc(100vh_/_var(--app-zoom,1)_-_110px)]
-                md:overflow-y-auto
+                lg:sticky
+                lg:top-[4.75rem]
+                lg:max-h-[calc(100vh_/_var(--app-zoom,1)_-_6rem)]
+                lg:overflow-y-auto
+                lg:overscroll-contain
 
                 rounded-[var(--card-radius)]
 
@@ -167,6 +204,8 @@ const ClassicLayout = () => {
                 setShowGrowth={setShowGrowth}
                 showTax={showTax}
                 setShowTax={setShowTax}
+                onCalculate={scrollToResults}
+                calculateRef={calculateRef}
               />
             </div>
 
@@ -175,288 +214,63 @@ const ClassicLayout = () => {
             ========================================= */}
 
             <div
+              ref={resultsRef}
               className="
-                space-y-5
+                space-y-6
+                lg:space-y-5
                 min-w-0
                 w-full
+
+                scroll-mt-[5rem]
               "
             >
               {/* =====================================
                   SUMMARY CARDS
               ===================================== */}
 
-              <SummaryCards />
+              <section className="space-y-3">
+                <SectionHeading
+                  icon={BadgeDollarSign}
+                  accent="from-purple-500 to-indigo-600"
+                  glow="shadow-[0_0_25px_rgba(124,58,237,0.25)]"
+                  title="Your Results"
+                  subtitle="The totals for this scenario at a glance"
+                  headingRef={resultsHeadingRef}
+                />
+
+                <SummaryCards />
+              </section>
+
+              {/* chart engine lives in the navbar on wide screens */}
+              <EngineToggle className="max-w-xs lg:hidden" />
 
               {/* =====================================
                   PROJECTION ANALYTICS
               ===================================== */}
 
               {showChart && (
-                <section className="space-y-3">
+                <section ref={chartsRef} className="space-y-3 scroll-mt-[5rem]">
                   {/* HEADER */}
 
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                    "
-                  >
-                    <div
-                      className="
-                        w-10
-                        h-10
-
-                        rounded-2xl
-
-                        flex
-                        items-center
-                        justify-center
-
-                        bg-gradient-to-br
-                        from-purple-400
-                        to-indigo-600
-
-                        shadow-[0_0_25px_rgba(168,85,247,0.25)]
-                      "
-                    >
-                      <Activity size={18} className="text-white" />
-                    </div>
-
-                    <div>
-                      <h2
-                        className="
-                          text-lg
-                          xl:text-xl
-
-                          font-black
-
-                          text-[var(--text-primary)]
-                        "
-                      >
-                        Projection Analytics
-                      </h2>
-
-                      <p
-                        className="
-                          text-xs
-                          xl:text-sm
-
-                          text-[var(--text-secondary)]
-                        "
-                      >
-                        Interactive 3D visualization and financial modeling
-                      </p>
-                    </div>
-                  </div>
+                  <SectionHeading
+                    icon={Activity}
+                    accent="from-purple-400 to-indigo-600"
+                    glow="shadow-[0_0_25px_rgba(168,85,247,0.25)]"
+                    title="Projection Analytics"
+                    subtitle="How your balance, withdrawals and taxes change each year"
+                    headingRef={chartsHeadingRef}
+                  />
 
                   {/* CHART */}
 
-                  {/* CHART */}
-
+                  {/* Interactive 3D charts, or the same four Manim videos as
+                      Workspace (render state lives in the dashboard shell) */}
                   {renderMode === "node" ? (
                     <ErrorBoundary>
                       <AdvancedChart />
-                   </ErrorBoundary>
+                    </ErrorBoundary>
                   ) : (
-                    <div
-                      className="
-      relative
-
-      w-full
-
-      min-h-[500px]
-      xl:min-h-[700px]
-
-      rounded-[var(--card-radius)]
-      overflow-hidden
-
-      border
-      border-purple-500/20
-
-      bg-black
-
-      flex
-      items-center
-      justify-center
-    "
-                    >
-                      <button
-                        onClick={() => setSceneDialogOpen(true)}
-                        className="
-        absolute
-        top-4
-        right-4
-        z-20
-
-        px-5
-        py-2
-
-        rounded-xl
-
-        bg-gradient-to-r
-            from-purple-400
-            to-indigo-500
-
-            text-white
-
-            shadow-[0_0_20px_rgba(168,85,247,0.35)]
-          `
-          : `
-            text-[var(--text-secondary)]
-
-            hover:text-white
-
-        transition-all
-      "
-                      >
-                        Generate Manim Analytics
-                      </button>
-
-                      {/* LOADING */}
-
-                      {isRendering && (
-                        <div
-                          className="
-          absolute
-          inset-0
-          z-20
-
-          flex
-          flex-col
-          items-center
-          justify-center
-
-          px-10
-
-          bg-black/90
-          backdrop-blur-md
-        "
-                        >
-                          {/* PERCENT RING */}
-                          <div className="relative w-24 h-24">
-                            <svg
-                              className="w-24 h-24 -rotate-90"
-                              viewBox="0 0 100 100"
-                            >
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="42"
-                                fill="none"
-                                strokeWidth="8"
-                                className="stroke-purple-500/20"
-                              />
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="42"
-                                fill="none"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                className="stroke-purple-400"
-                                style={{
-                                  strokeDasharray: 2 * Math.PI * 42,
-                                  strokeDashoffset:
-                                    2 *
-                                    Math.PI *
-                                    42 *
-                                    (1 - renderProgress / 100),
-                                  transition:
-                                    "stroke-dashoffset 0.4s ease",
-                                }}
-                              />
-                            </svg>
-
-                            <div
-                              className="
-                                absolute
-                                inset-0
-
-                                flex
-                                items-center
-                                justify-center
-
-                                text-white
-                                text-xl
-                                font-bold
-                              "
-                            >
-                              {Math.round(renderProgress)}%
-                            </div>
-                          </div>
-
-                          {/* LINEAR BAR */}
-                          <div
-                            className="
-                              mt-6
-                              w-full
-                              max-w-xs
-
-                              h-2
-
-                              rounded-full
-
-                              bg-purple-500/15
-
-                              overflow-hidden
-                            "
-                          >
-                            <div
-                              className="
-                                h-full
-
-                                rounded-full
-
-                                bg-gradient-to-r
-                                from-purple-400
-                                to-indigo-400
-                              "
-                              style={{
-                                width: `${renderProgress}%`,
-                                transition: "width 0.4s ease",
-                              }}
-                            />
-                          </div>
-
-                          <p
-                            className="
-            mt-4
-
-            text-purple-300
-
-            text-sm
-            font-semibold
-          "
-                          >
-                            {renderStage || "Rendering Manim Analytics..."}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* VIDEO */}
-
-                      {videoUrl && (
-                        <video
-                          key={videoUrl}
-                          controls
-                          autoPlay
-                          preload="auto"
-                          className="
-    w-full
-    h-full
-
-    object-cover
-
-    rounded-b-3xl
-
-    bg-black
-  "
-                        >
-                          <source src={videoUrl} type="video/mp4" />
-                        </video>
-                      )}
-                    </div>
+                    <CinematicPanel cinematic={cinematic} />
                   )}
                 </section>
               )}
@@ -469,60 +283,13 @@ const ClassicLayout = () => {
                 <section className="space-y-3">
                   {/* HEADER */}
 
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                    "
-                  >
-                    <div
-                      className="
-                        w-10
-                        h-10
-
-                        rounded-2xl
-
-                        flex
-                        items-center
-                        justify-center
-
-                        bg-gradient-to-br
-                        from-violet-500
-                        to-fuchsia-600
-
-                        shadow-[0_0_25px_rgba(168,85,247,0.25)]
-                      "
-                    >
-                      <Waves size={18} className="text-white" />
-                    </div>
-
-                    <div>
-                      <h2
-                        className="
-                          text-lg
-                          xl:text-xl
-
-                          font-black
-
-                          text-[var(--text-primary)]
-                        "
-                      >
-                        Wealth Waterfall
-                      </h2>
-
-                      <p
-                        className="
-                          text-xs
-                          xl:text-sm
-
-                          text-[var(--text-secondary)]
-                        "
-                      >
-                        Cinematic financial flow visualization
-                      </p>
-                    </div>
-                  </div>
+                  <SectionHeading
+                    icon={Waves}
+                    accent="from-violet-500 to-fuchsia-600"
+                    glow="shadow-[0_0_25px_rgba(168,85,247,0.25)]"
+                    title="Wealth Waterfall"
+                    subtitle="Where your money goes, year by year"
+                  />
 
                   {/* WATERFALL */}
 
@@ -540,129 +307,95 @@ const ClassicLayout = () => {
             <section className="space-y-3 mt-8">
               {/* HEADER */}
 
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-3
-                "
-              >
-                <div
-                  className="
-                    w-10
-                    h-10
-
-                    rounded-2xl
-
-                    flex
-                    items-center
-                    justify-center
-
-                    bg-gradient-to-br
-                    from-emerald-500
-                    to-green-600
-
-                    shadow-[0_0_25px_rgba(34,197,94,0.25)]
-                  "
-                >
-                  <Table2 size={18} className="text-white" />
-                </div>
-
-                <div>
-                  <h2
-                    className="
-                      text-lg
-                      xl:text-xl
-
-                      font-black
-
-                      text-[var(--text-primary)]
-                    "
-                  >
-                    Projection Table
-                  </h2>
-
-                  <p
-                    className="
-                      text-xs
-                      xl:text-sm
-
-                      text-[var(--text-secondary)]
-                    "
-                  >
-                    Detailed yearly analytics
-                  </p>
-                </div>
-              </div>
+              <SectionHeading
+                icon={Table2}
+                accent="from-emerald-500 to-green-600"
+                glow="shadow-[0_0_25px_rgba(34,197,94,0.25)]"
+                title="Projection Table"
+                subtitle="Every year's withdrawal, tax and ending balance"
+              />
 
               {/* TABLE */}
 
               <DataTable />
             </section>
           )}
-      <Dialog open={sceneDialogOpen} onClose={() => setSceneDialogOpen(false)}>
-        <DialogTitle>Select Analytics Video</DialogTitle>
 
-        <DialogContent>
-          <div className="flex flex-col gap-3 pt-2">
-            <button
-              className="px-4 py-3 rounded-xl bg-cyan-500 text-white"
-              onClick={() => {
-                setSceneType("projection");
+      {/* =============================================
+          STICKY CALCULATE BAR — phones/tablets only
+      ============================================= */}
 
-                setSceneDialogOpen(false);
+      <div
+        inert={!showJumpBar}
+        className={`
+          fixed
+          inset-x-0
+          bottom-0
+          z-30
 
-                generateCinematic("projection");
-              }}
-            >
-              Projection Analysis
-            </button>
+          px-4
+          pt-3
+          pb-[max(0.75rem,env(safe-area-inset-bottom))]
 
-            <button
-              className="px-4 py-3 rounded-xl bg-purple-500 text-white"
-              onClick={() => {
-                setSceneType("rmd");
+          border-t
+          border-[var(--border-color)]
+          bg-[var(--glass-bg)]
+          backdrop-blur-2xl
+          shadow-[0_-10px_30px_rgba(15,23,42,0.12)]
 
-                setSceneDialogOpen(false);
+          transition-[transform,opacity]
+          duration-300
+          ease-[cubic-bezier(0.22,1,0.36,1)]
+          motion-reduce:transition-none
 
-                generateCinematic("rmd");
-              }}
-            >
-              RMD Analysis
-            </button>
+          lg:hidden
+          print:hidden
 
-            <button
-              className="px-4 py-3 rounded-xl bg-red-500 text-white"
-              onClick={() => {
-                setSceneType("tax");
+          ${showJumpBar ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0"}
+        `}
+      >
+        <button
+          type="button"
+          onClick={scrollToResults}
+          aria-label="Calculate and show results"
+          className="
+            mx-auto
+            flex
+            w-full
+            max-w-xl
+            min-h-[3.5rem]
+            items-center
+            justify-center
+            gap-3
 
-                setSceneDialogOpen(false);
+            rounded-2xl
 
-                generateCinematic("tax");
-              }}
-            >
-              Tax Analysis
-            </button>
+            bg-gradient-to-r
+            from-purple-600
+            via-violet-600
+            to-indigo-600
 
-            <button
-              className="px-4 py-3 rounded-xl bg-orange-500 text-white"
-              onClick={() => {
-                setSceneType("collapse");
+            px-6
 
-                setSceneDialogOpen(false);
+            text-lg
+            font-extrabold
+            text-white
 
-                generateCinematic("collapse");
-              }}
-            >
-              Collapse Analysis
-            </button>
-          </div>
-        </DialogContent>
+            shadow-[0_8px_24px_rgba(124,58,237,0.4)]
 
-        <DialogActions>
-          <Button onClick={() => setSceneDialogOpen(false)}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+            active:scale-[0.99]
+          "
+        >
+          Calculate
+          {result && (
+            <span className="font-semibold text-white/85 text-base">
+              · see results
+            </span>
+          )}
+          <ArrowDown size={22} aria-hidden />
+        </button>
+      </div>
+
     </div>
   );
 };

@@ -141,10 +141,12 @@ export const CinematicLegend = ({ items }) => {
   );
 };
 
-export const CinematicCanvas = ({ children, cameraPos = [0, 8, 20], onMouseMove, ...props }) => {
+// frameloop: "never" freezes rendering (e.g. while the canvas is off screen)
+export const CinematicCanvas = ({ children, cameraPos = [0, 8, 20], onMouseMove, frameloop = "always", ...props }) => {
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }} onMouseMove={onMouseMove}>
       <Canvas
+        frameloop={frameloop}
         gl={{ antialias: true, alpha: false, stencil: false, depth: true }}
         dpr={[1, 2]}
         camera={{ position: cameraPos, fov: 45 }}

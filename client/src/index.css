@@ -261,7 +261,7 @@ th {
 /* =====================================================
    FLUID SLIDER
    The native range input sits invisibly on top of the
-   custom visuals; its thumb must stay 24px to match
+   custom visuals; its thumb must stay 28px to match
    THUMB in FluidSlider.jsx.
 ===================================================== */
 
@@ -284,13 +284,13 @@ input.fluid-range:focus {
 
 input.fluid-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
 }
 
 input.fluid-range::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border: 0;
 }
 
@@ -316,6 +316,173 @@ input.fluid-range::-moz-range-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .fluid-shimmer {
+    animation: none;
+  }
+}
+
+/* =====================================================
+   DASHBOARD — SENIOR-FRIENDLY MOBILE TUNING
+   Calculator.jsx puts .rmd-dashboard on <html> while a
+   dashboard layout is mounted, so none of this reaches
+   the landing or login pages.
+===================================================== */
+
+/* Larger base type on phones and tablets. Tailwind sizes are rem, so text,
+   spacing and control heights all grow together; the text-size control
+   (--app-zoom) still multiplies on top of this. */
+@media (max-width: 639.98px) {
+  html.rmd-dashboard {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  html.rmd-dashboard {
+    font-size: 15px;
+  }
+}
+
+/* Stronger secondary text — AA+ on cards and the page background */
+html.rmd-dashboard:not(.dark) {
+  --text-secondary: #475569;
+}
+
+html.rmd-dashboard.dark {
+  --text-secondary: #aab6c8;
+}
+
+/* Typing fields at 16px or more: readable, and iOS won't zoom on focus */
+@media (max-width: 1023.98px) {
+  html.rmd-dashboard input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  html.rmd-dashboard select,
+  html.rmd-dashboard textarea {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Finger-sized targets on touch screens */
+@media (pointer: coarse) {
+  html.rmd-dashboard main button,
+  html.rmd-dashboard main select,
+  html.rmd-dashboard main [role="tab"],
+  html.rmd-dashboard main [role="radio"] {
+    min-height: 44px;
+  }
+}
+
+/* No lift-on-hover on touch screens — the hover state sticks after a tap */
+@media (hover: none) {
+  html.rmd-dashboard button:hover {
+    transform: none;
+  }
+}
+
+/* Clear keyboard focus. Text fields keep their own purple ring. */
+html.rmd-dashboard :is(a, button, summary, [role="tab"], [role="radio"]):focus-visible {
+  outline: 3px solid #a855f7;
+  outline-offset: 2px;
+}
+
+/* Headings that receive focus from "Calculate" — announced, not outlined */
+html.rmd-dashboard [tabindex="-1"]:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.rmd-dashboard *,
+  html.rmd-dashboard *::before,
+  html.rmd-dashboard *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* table money colors that pass contrast in both themes */
+html.rmd-dashboard:not(.dark) {
+  --rmd-color: #6d28d9;
+  --tax-color: #dc2626;
+}
+
+html.rmd-dashboard.dark {
+  --rmd-color: #a78bfa;
+  --tax-color: #f87171;
+}
+
+/* =====================================================
+   SKELETON SHIMMER + FADE-IN (dashboard number cards)
+===================================================== */
+
+:root {
+  --skeleton-base: rgba(139, 92, 246, 0.1);
+  --skeleton-shine: rgba(255, 255, 255, 0.75);
+}
+
+.dark {
+  --skeleton-base: rgba(148, 163, 184, 0.14);
+  --skeleton-shine: rgba(255, 255, 255, 0.09);
+}
+
+.rmd-skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--skeleton-base);
+}
+
+.rmd-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+  animation: rmd-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes rmd-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* fresh numbers ease in once the calculation lands */
+.rmd-fade-in {
+  animation: rmd-fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rmd-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rmd-skeleton::after {
+    display: none;
+  }
+
+  .rmd-fade-in {
+    animation: none;
+  }
+}
+
+/* selection tick pops in */
+.rmd-pop {
+  animation: rmd-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes rmd-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rmd-pop {
     animation: none;
   }
 }

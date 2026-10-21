@@ -1,0 +1,22 @@
+{
+  "name": "Lackner Retirement Calculator",
+  "short_name": "RMD Calculator",
+  "description": "Interactive retirement analytics and RMD projection modeling.",
+  "id": "/",
+  "start_url": "/dashboard/classic",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#020617",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    { "src": "/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Classic calculator", "url": "/dashboard/classic", "icons": [{ "src": "/pwa-192.png", "sizes": "192x192" }] },
+    { "name": "Planner", "url": "/dashboard/planner", "icons": [{ "src": "/pwa-192.png", "sizes": "192x192" }] }
+  ]
+}

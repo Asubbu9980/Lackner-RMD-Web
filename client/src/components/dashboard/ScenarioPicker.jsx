@@ -51,7 +51,11 @@ const ScenarioPicker = ({ value, onChange, groups = ["living", "inherited"], var
                     rounded-xl
                     border
                     text-left
+                    transition-[background-color,border-color,box-shadow,transform]
+                    duration-300
+                    ease-out
                     hover:transform-none
+                    active:scale-[0.98]
                     ${isCards ? "p-4" : "px-3 py-2.5"}
                     ${
                       active
@@ -70,6 +74,8 @@ const ScenarioPicker = ({ value, onChange, groups = ["living", "inherited"], var
                       text-[10px]
                       font-bold
                       tabular-nums
+                      transition-colors
+                      duration-300
                       ${
                         active
                           ? "bg-purple-500 text-white"
@@ -99,7 +105,7 @@ const ScenarioPicker = ({ value, onChange, groups = ["living", "inherited"], var
                     </span>
                   </span>
 
-                  {active && <CircleCheck size={18} className="shrink-0 text-purple-400" />}
+                  {active && <CircleCheck size={18} className="rmd-pop shrink-0 text-purple-400" />}
                 </button>
               );
             })}

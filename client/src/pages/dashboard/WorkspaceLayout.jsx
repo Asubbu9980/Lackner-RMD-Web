@@ -84,15 +84,35 @@ const Section = ({ icon: Icon, title, summary, defaultOpen = true, forceOpen = f
 
         <span className="text-sm font-bold text-[var(--text-primary)]">{title}</span>
 
-        <span className="ml-auto truncate text-xs text-[var(--text-secondary)]">{!open && summary}</span>
+        <span
+          aria-hidden={open}
+          className={`ml-auto min-w-0 truncate text-sm text-[var(--text-secondary)] transition-opacity duration-300 ${open ? "opacity-0" : "opacity-100"}`}
+        >
+          {summary}
+        </span>
 
         <ChevronDown
           size={16}
-          className={`shrink-0 text-[var(--text-secondary)] transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-[var(--text-secondary)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "rotate-180" : ""}`}
         />
       </button>
 
-      {open && <div className="px-5 pb-5">{children}</div>}
+      {/* stays mounted so it can animate open/closed (grid rows 0fr ↔ 1fr) */}
+      <div
+        inert={!open}
+        className={`
+          grid
+          transition-[grid-template-rows,opacity]
+          duration-300
+          ease-[cubic-bezier(0.22,1,0.36,1)]
+          motion-reduce:transition-none
+          ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}
+        `}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="px-5 pb-5 pt-1">{children}</div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -121,6 +141,7 @@ const InputsSidebar = ({ onCollapse }) => {
         bg-[var(--glass-bg)]
         backdrop-blur-xl
         shadow-[var(--shadow-md)]
+        lg:w-[360px]
         lg:sticky
         lg:top-[76px]
         lg:max-h-[calc(100vh_/_var(--app-zoom,1)_-_110px)]
@@ -144,7 +165,7 @@ const InputsSidebar = ({ onCollapse }) => {
         "
       >
         <div>
-          <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-purple-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-purple-600 dark:text-purple-400">
             Configuration
           </p>
           <h2 className="text-lg font-black tracking-tight text-[var(--text-primary)]">Inputs</h2>
@@ -210,7 +231,7 @@ const InputsSidebar = ({ onCollapse }) => {
 // =====================================================
 
 const WorkspaceLayout = () => {
-  const { inputs, result, loading, error } = useRmd();
+  const { inputs, result, error } = useRmd();
 
   const [tab, setTabState] = useState(readTab);
   const [inputsOpen, setInputsOpen] = useState(true);
@@ -245,10 +266,31 @@ const WorkspaceLayout = () => {
         items-start
         gap-4
         xl:gap-5
-        ${inputsOpen ? "lg:grid-cols-[360px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"}
+        lg:transition-[grid-template-columns,column-gap]
+        lg:duration-500
+        lg:ease-[cubic-bezier(0.22,1,0.36,1)]
+        motion-reduce:transition-none
+        ${inputsOpen ? "lg:grid-cols-[360px_minmax(0,1fr)]" : "lg:grid-cols-[0px_minmax(0,1fr)] lg:!gap-x-0"}
       `}
     >
-      {inputsOpen && <InputsSidebar onCollapse={() => setInputsOpen(false)} />}
+      {/* the sidebar stays mounted and slides/fades as its column animates;
+          the stretched wrapper keeps the sticky aside working */}
+      <div
+        inert={!inputsOpen}
+        className={`
+          min-w-0
+          lg:self-stretch
+          lg:overflow-clip
+          lg:[overflow-clip-margin:24px]
+          transition-[opacity,transform]
+          duration-500
+          ease-[cubic-bezier(0.22,1,0.36,1)]
+          motion-reduce:transition-none
+          ${inputsOpen ? "opacity-100" : "max-lg:hidden lg:-translate-x-6 lg:opacity-0"}
+        `}
+      >
+        <InputsSidebar onCollapse={() => setInputsOpen(false)} />
+      </div>
 
       <div className="min-w-0 space-y-4">
         {/* RESULTS HEADER */}
@@ -259,6 +301,7 @@ const WorkspaceLayout = () => {
                 type="button"
                 onClick={() => setInputsOpen(true)}
                 className="
+                  rmd-fade-in
                   flex
                   items-center
                   gap-2
@@ -281,7 +324,7 @@ const WorkspaceLayout = () => {
             )}
 
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-black tracking-tight text-[var(--text-primary)] xl:text-2xl">
+              <h1 className="text-xl leading-tight sm:truncate font-black tracking-tight text-[var(--text-primary)] xl:text-2xl">
                 Chart {scenario.chart} · {scenario.title}
               </h1>
 
@@ -328,11 +371,14 @@ const WorkspaceLayout = () => {
                   py-1.5
                   text-sm
                   font-semibold
+                  transition-[background-color,color,box-shadow,transform]
+                  duration-300
                   hover:transform-none
+                  active:scale-[0.97]
                   ${
                     tab === id
-                      ? "bg-[var(--bg-secondary)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] ring-1 ring-purple-400/30"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-[0_4px_14px_rgba(124,58,237,0.35)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]"
                   }
                 `}
               >
@@ -351,7 +397,7 @@ const WorkspaceLayout = () => {
           <ResultsSkeleton />
         ) : (
           <>
-            <KpiGrid insights={insights} inputs={inputs} loading={loading} />
+            <KpiGrid insights={insights} inputs={inputs} />
 
             <Milestones insights={insights} inputs={inputs} />
 

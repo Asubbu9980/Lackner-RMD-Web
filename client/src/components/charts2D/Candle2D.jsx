@@ -6,41 +6,40 @@ import {
   Tooltip,
   CartesianGrid,
   Bar,
-  Cell,
 } from "recharts";
 
+import { toCandles } from "../../utils/candles";
+import { formatCurrency, formatCompact } from "../../utils/format";
+
+// One candle per year. The bar spans low → high (the wick); the body is drawn
+// inside it from open → close using the same pixels-per-dollar scale.
+const CandleShape = ({ x, y, width, height, payload }) => {
+  if (!payload || !height) return null;
+
+  const { open, close, high, low, color } = payload;
+  const k = height / Math.max(high - low, 1);
+  const bodyTop = y + (high - Math.max(open, close)) * k;
+  const bodyHeight = Math.max(Math.abs(close - open) * k, 2);
+  const bodyWidth = Math.max(Math.min(width * 0.7, 18), 3);
+  const cx = x + width / 2;
+
+  return (
+    <g>
+      <line x1={cx} x2={cx} y1={y} y2={y + height} stroke={color} strokeWidth={1.5} />
+      <rect x={cx - bodyWidth / 2} y={bodyTop} width={bodyWidth} height={bodyHeight} rx={2} fill={color} />
+    </g>
+  );
+};
+
+const Row = ({ label, value, color }) => (
+  <p style={{ margin: "0 0 6px 0", color, fontWeight: 600 }}>
+    {label}: {formatCurrency(value)}
+  </p>
+);
+
 const Candle2D = ({ data, isDark }) => {
-  // =========================
-  // MATCH 3D LOGIC
-  // =========================
-
-  const candleData = data.slice(0, 24).map((d, i) => {
-    const base = (d.balance || d.endBalance || 0) / 100000;
-
-    const open = base * (0.9 + Math.sin(i * 0.5) * 0.1);
-
-    const close = base * (1.1 + Math.cos(i * 0.5) * 0.1);
-
-    const high = Math.max(open, close) + 0.8;
-
-    const low = Math.min(open, close) - 0.8;
-
-    return {
-      age: d.age,
-      year: d.year,
-
-      open,
-      close,
-      high,
-      low,
-
-      color: close > open ? "#10b981" : "#f43f5e",
-
-      body: Math.abs(close - open),
-
-      bodyBase: Math.min(open, close),
-    };
-  });
+  // every projected year, from the real balances (same maths as the 3D chart)
+  const candleData = toCandles(data);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -63,14 +62,12 @@ const Candle2D = ({ data, isDark }) => {
 
         {/* Y AXIS */}
 
-        <YAxis />
+        <YAxis tickFormatter={formatCompact} tick={{ fontSize: 12 }} width={64} />
 
         {/* TOOLTIP */}
         <Tooltip
           cursor={{
-            stroke: isDark ? "rgba(255,255,255,0.15)" : "rgba(15,23,42,0.12)",
-
-            strokeWidth: 2,
+            fill: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.05)",
           }}
           content={({ active, payload }) => {
             if (active && payload && payload.length) {
@@ -95,7 +92,7 @@ const Candle2D = ({ data, isDark }) => {
                       ? "0 10px 30px rgba(0,0,0,0.45)"
                       : "0 10px 30px rgba(0,0,0,0.12)",
 
-                    minWidth: "150px",
+                    minWidth: "190px",
 
                     backdropFilter: "blur(10px)",
                   }}
@@ -111,64 +108,13 @@ const Candle2D = ({ data, isDark }) => {
                       color: isDark ? "#ffffff" : "#111827",
                     }}
                   >
-                    Age: {d.age}
+                    Age {d.age} · {d.year}
                   </p>
 
-                  {/* OPEN */}
-
-                  <p
-                    style={{
-                      margin: "0 0 6px 0",
-
-                      color: "#0ea5e9",
-
-                      fontWeight: 600,
-                    }}
-                  >
-                    Open: {d.open.toFixed(2)}
-                  </p>
-
-                  {/* CLOSE */}
-
-                  <p
-                    style={{
-                      margin: "0 0 6px 0",
-
-                      color: "#22c55e",
-
-                      fontWeight: 600,
-                    }}
-                  >
-                    Close: {d.close.toFixed(2)}
-                  </p>
-
-                  {/* HIGH */}
-
-                  <p
-                    style={{
-                      margin: "0 0 6px 0",
-
-                      color: "#a855f7",
-
-                      fontWeight: 600,
-                    }}
-                  >
-                    High: {d.high.toFixed(2)}
-                  </p>
-
-                  {/* LOW */}
-
-                  <p
-                    style={{
-                      margin: 0,
-
-                      color: "#ef4444",
-
-                      fontWeight: 600,
-                    }}
-                  >
-                    Low: {d.low.toFixed(2)}
-                  </p>
+                  <Row label="Opening balance" value={d.open} color="#0ea5e9" />
+                  <Row label="RMD withdrawn" value={d.rmd} color="#a855f7" />
+                  <Row label="Growth" value={d.growth} color="#22c55e" />
+                  <Row label="Closing balance" value={d.close} color={d.color} />
                 </div>
               );
             }
@@ -177,17 +123,13 @@ const Candle2D = ({ data, isDark }) => {
           }}
         />
 
-        {/* WICKS */}
+        {/* CANDLES — range bar low → high with a custom wick + body */}
 
-        <Bar dataKey="high" stackId="a" fill="transparent" />
-
-        {/* BODY */}
-
-        <Bar dataKey="body" stackId="a" radius={[4, 4, 0, 0]}>
-          {candleData.map((entry, index) => (
-            <Cell key={index} fill={entry.color} />
-          ))}
-        </Bar>
+        <Bar
+          dataKey={(d) => [d.low, d.high]}
+          shape={<CandleShape />}
+          isAnimationActive
+        />
       </ComposedChart>
     </ResponsiveContainer>
   );

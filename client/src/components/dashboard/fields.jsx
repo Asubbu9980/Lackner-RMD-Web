@@ -15,10 +15,10 @@ export const Field = ({ label, htmlFor, hint, error, aside, children }) => (
       <label
         htmlFor={htmlFor}
         className="
-          text-[11px]
+          text-sm
           font-semibold
           uppercase
-          tracking-[0.12em]
+          tracking-[0.1em]
           text-[var(--text-secondary)]
         "
       >
@@ -31,12 +31,12 @@ export const Field = ({ label, htmlFor, hint, error, aside, children }) => (
     {children}
 
     {error ? (
-      <p className="mt-1.5 flex items-center gap-1 text-xs text-rose-400">
+      <p className="mt-1.5 flex items-center gap-1 text-sm text-rose-600 dark:text-rose-400">
         <CircleAlert size={12} />
         {error}
       </p>
     ) : (
-      hint && <p className="mt-1.5 text-xs text-[var(--text-secondary)]">{hint}</p>
+      hint && <p className="mt-1.5 text-sm text-[var(--text-secondary)]">{hint}</p>
     )}
   </div>
 );
@@ -59,7 +59,7 @@ export const Badge = ({ children, tone = "purple" }) => {
         border
         px-2
         py-0.5
-        text-[11px]
+        text-[0.8125rem]
         font-semibold
         whitespace-nowrap
         ${tones[tone]}
@@ -77,9 +77,9 @@ export const Chip = ({ active, onClick, children }) => (
     className={`
       rounded-full
       border
-      px-2.5
+      px-3
       py-1
-      text-xs
+      text-sm
       font-semibold
       hover:transform-none
       ${
@@ -265,7 +265,10 @@ export const Segmented = ({ options, value, onChange, ariaLabel }) => (
             text-xs
             font-semibold
             whitespace-nowrap
+            transition-[background-color,color,box-shadow,transform]
+            duration-300
             hover:transform-none
+            active:scale-[0.97]
             ${
               active
                 ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-[0_4px_14px_rgba(124,58,237,0.35)]"

@@ -19,7 +19,8 @@ const Analytics2D = ({ data, isDark, formatCurrency }) => {
   // DATA
   // =========================
 
-  const analyticsData = data.slice(0, 24).map((d) => ({
+  // every projected year (was capped at the first 24)
+  const analyticsData = data.map((d) => ({
     age: d.age,
 
     rmd: d.rmd,

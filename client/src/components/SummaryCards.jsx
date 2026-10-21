@@ -1,4 +1,5 @@
 import useRmd from "../hooks/useRmd";
+import Skeleton from "./dashboard/Skeleton";
 
 import {
   Wallet,
@@ -37,7 +38,7 @@ const cards = (
       "border-purple-400/15",
 
     iconColor:
-      "text-purple-300",
+      "text-purple-600 dark:text-purple-300",
   },
 
   {
@@ -62,7 +63,7 @@ const cards = (
       "border-purple-400/15",
 
     iconColor:
-      "text-purple-300",
+      "text-purple-600 dark:text-purple-300",
   },
 
   {
@@ -87,7 +88,7 @@ const cards = (
       "border-red-400/15",
 
     iconColor:
-      "text-red-300",
+      "text-red-600 dark:text-red-300",
 
     danger: true,
   },
@@ -112,12 +113,13 @@ const cards = (
       "border-emerald-400/15",
 
     iconColor:
-      "text-emerald-300",
+      "text-emerald-600 dark:text-emerald-300",
   },
 ];
 
 const SummaryCards = () => {
-  const { result } =
+  // calculating: shimmer the numbers until the new result lands
+  const { result, calculating } =
     useRmd();
 
   if (!result) return null;
@@ -131,7 +133,9 @@ const SummaryCards = () => {
         sm:grid-cols-2
         xl:grid-cols-4
 
-        gap-5
+        gap-3
+        sm:gap-4
+        xl:gap-5
       "
     >
       {cards(result).map(
@@ -160,13 +164,13 @@ const SummaryCards = () => {
 
                 backdrop-blur-xl
 
-                p-5
+                p-4
+                sm:p-5
 
-                transition-all
+                transition-[transform,box-shadow]
                 duration-300
 
                 hover:-translate-y-1
-                hover:scale-[1.01]
 
                 hover:shadow-[0_10px_40px_rgba(0,0,0,0.25)]
               `}
@@ -206,18 +210,20 @@ const SummaryCards = () => {
                   flex
                   items-start
                   justify-between
+                  gap-3
 
-                  mb-5
+                  mb-3
+                  sm:mb-5
                 "
               >
                 {/* TEXT */}
 
-                <div>
+                <div className="min-w-0">
                   <p
                     className="
-                      text-[11px]
+                      text-sm
                       uppercase
-                      tracking-[0.18em]
+                      tracking-[0.12em]
 
                       text-[var(--text-secondary)]
 
@@ -227,23 +233,33 @@ const SummaryCards = () => {
                     {card.title}
                   </p>
 
-                  <h2
-                    className={`
-                      mt-2
+                  {calculating ? (
+                    <Skeleton className="mt-2.5 h-9 w-44 max-w-full sm:h-10" />
+                  ) : (
+                    <h2
+                      key={card.value}
+                      className={`
+                        mt-1.5
+                        rmd-fade-in
 
-                      text-3xl
-                      font-black
-                      tracking-tight
+                        text-[1.75rem]
+                        sm:text-3xl
+                        leading-tight
+                        font-black
+                        tracking-tight
+                        tabular-nums
+                        break-words
 
-                      ${
-                        card.danger
-                          ? "text-red-400"
-                          : "text-[var(--text-primary)]"
-                      }
-                    `}
-                  >
-                    {card.value}
-                  </h2>
+                        ${
+                          card.danger
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-[var(--text-primary)]"
+                        }
+                      `}
+                    >
+                      {card.value}
+                    </h2>
+                  )}
                 </div>
 
                 {/* ICON */}
@@ -252,6 +268,7 @@ const SummaryCards = () => {
                   className="
                     w-12
                     h-12
+                    shrink-0
 
                     rounded-2xl
 
@@ -259,10 +276,12 @@ const SummaryCards = () => {
                     items-center
                     justify-center
 
-                    bg-white/5
+                    bg-white/60
+                    dark:bg-white/5
 
                     border
-                    border-white/10
+                    border-black/5
+                    dark:border-white/10
 
                     backdrop-blur-xl
                   "
@@ -296,7 +315,7 @@ const SummaryCards = () => {
                     text-[var(--text-secondary)]
                   "
                 >
-                  {card.subtitle}
+                  {calculating ? <Skeleton className="h-4 w-32" /> : card.subtitle}
                 </p>
 
                 <div

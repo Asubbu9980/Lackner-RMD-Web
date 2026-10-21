@@ -1,3 +1,4 @@
+import { useLayoutEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 import DashboardNavbar from "../components/dashboard/DashboardNavbar";
@@ -10,6 +11,13 @@ import useFontScale from "../hooks/useFontScale";
 const Calculator = () => {
   const cinematic = useCinematic();
   const fontScale = useFontScale();
+
+  // scopes the dashboard's mobile type, contrast and touch rules (index.css)
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.classList.add("rmd-dashboard");
+    return () => root.classList.remove("rmd-dashboard");
+  }, []);
 
   return (
     <div
@@ -58,7 +66,7 @@ const Calculator = () => {
 
       <DashboardNavbar fontScale={fontScale} />
 
-      <main className="relative z-10 mx-auto w-full max-w-[1800px] p-3 lg:p-5">
+      <main className="relative z-10 mx-auto w-full max-w-[1800px] px-4 py-4 sm:px-5 lg:p-5">
         <Outlet context={{ cinematic }} />
       </main>
     </div>

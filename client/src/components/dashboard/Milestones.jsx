@@ -2,6 +2,8 @@ import { Flag, CalendarClock, Mountain, PiggyBank, CircleAlert } from "lucide-re
 
 import { formatCompact } from "../../utils/format";
 import { isDeceasedScenario } from "../../utils/rmd";
+import useRmd from "../../hooks/useRmd";
+import Skeleton from "./Skeleton";
 
 const buildMilestones = (insights, inputs, thisYear = new Date().getFullYear()) => {
   const inherited = isDeceasedScenario(inputs.scenario);
@@ -61,6 +63,7 @@ const buildMilestones = (insights, inputs, thisYear = new Date().getFullYear()) 
 // variant "strip" — tiles (Workspace) · variant "timeline" — connected line (Planner)
 const Milestones = ({ insights, inputs, variant = "strip" }) => {
   const items = buildMilestones(insights, inputs);
+  const { calculating } = useRmd();
 
   if (variant === "timeline") {
     return (
@@ -110,11 +113,19 @@ const Milestones = ({ insights, inputs, variant = "strip" }) => {
                 <Icon size={16} />
               </span>
 
-              <div className="min-w-0">
-                <p className="text-lg font-black tabular-nums text-[var(--text-primary)]">{m.year}</p>
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{m.title}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{m.detail}</p>
-              </div>
+              {calculating ? (
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:items-center">
+                  <Skeleton className="h-5 w-14" />
+                  <Skeleton className="h-3.5 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              ) : (
+                <div key={`${m.year}${m.detail}`} className="rmd-fade-in min-w-0">
+                  <p className="text-lg font-black tabular-nums text-[var(--text-primary)]">{m.year}</p>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{m.title}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{m.detail}</p>
+                </div>
+              )}
             </li>
           );
         })}
@@ -149,12 +160,19 @@ const Milestones = ({ insights, inputs, variant = "strip" }) => {
               <Icon size={15} />
             </span>
 
-            <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-[var(--text-secondary)]">
-                {m.title} · <span className="tabular-nums text-[var(--text-primary)]">{m.year}</span>
-              </p>
-              <p className="truncate text-sm font-bold text-[var(--text-primary)]">{m.detail}</p>
-            </div>
+            {calculating ? (
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <Skeleton className="h-3 w-3/5" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+            ) : (
+              <div key={`${m.year}${m.detail}`} className="rmd-fade-in min-w-0">
+                <p className="truncate text-xs font-semibold text-[var(--text-secondary)]">
+                  {m.title} · <span className="tabular-nums text-[var(--text-primary)]">{m.year}</span>
+                </p>
+                <p className="truncate text-sm font-bold text-[var(--text-primary)]">{m.detail}</p>
+              </div>
+            )}
           </div>
         );
       })}

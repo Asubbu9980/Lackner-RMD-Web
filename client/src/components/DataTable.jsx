@@ -75,7 +75,8 @@ const DataTable = () => {
           position: "relative",
           zIndex: 2,
 
-          p: 3,
+          p: { xs: 2, sm: 3 },
+          "&:last-child": { pb: { xs: 2, sm: 3 } },
         }}
       >
         {/* =================================
@@ -91,7 +92,9 @@ const DataTable = () => {
             justifyContent:
               "space-between",
 
-            mb: 3,
+            gap: 2,
+
+            mb: { xs: 2, sm: 3 },
           }}
         >
           {/* LEFT */}
@@ -165,7 +168,7 @@ const DataTable = () => {
               sx={{
                 mt: 0.5,
 
-                fontSize: 13,
+                fontSize: "max(13px, 0.875rem)",
 
                 color:
                   "var(--text-secondary)",
@@ -181,13 +184,14 @@ const DataTable = () => {
 
           <Box
             sx={{
+              display: { xs: "none", sm: "flex" },
+              flexShrink: 0,
+
               width: 54,
               height: 54,
 
               borderRadius:
                 "18px",
-
-              display: "flex",
 
               alignItems:
                 "center",
@@ -219,10 +223,44 @@ const DataTable = () => {
 
             overflowY: "auto",
 
-            maxHeight: 520,
+            maxHeight: { xs: 460, md: 520 },
 
             borderRadius:
-              "24px",
+              { xs: "18px", sm: "24px" },
+
+            // swipe sideways inside the card, never the page
+            overscrollBehaviorX: "contain",
+
+            "& table": {
+              minWidth: { xs: 520, md: 900 },
+            },
+
+            // fixed column widths only where there's room for them
+            "& th": {
+              width: { md: "180px" },
+            },
+            "& th:nth-of-type(1)": { width: { md: "120px" } },
+            "& th:nth-of-type(2)": { width: { md: "100px" } },
+            "& th:nth-of-type(5)": { width: { md: "260px" } },
+
+            "& th, & td": {
+              padding: { xs: "14px 14px", md: "18px 20px" },
+              whiteSpace: "nowrap",
+            },
+
+            // year stays pinned while the money columns scroll
+            "& tbody td:first-of-type": {
+              position: "sticky",
+              left: 0,
+              zIndex: 1,
+              background: "var(--bg-secondary)",
+            },
+
+            "& thead th:first-of-type": {
+              position: "sticky",
+              left: 0,
+              zIndex: 6,
+            },
 
             border:
               "1px solid var(--border-color)",
@@ -255,7 +293,6 @@ const DataTable = () => {
 
               borderSpacing: 0,
 
-              minWidth: "900px",
             }}
           >
             {/* =================================
@@ -298,16 +335,6 @@ const DataTable = () => {
                     <th
                       key={i}
                       style={{
-                        width:
-                          head === "Year"
-                            ? "120px"
-                            : head === "Age"
-                              ? "100px"
-                              : head === "Ending Balance"
-                                ? "260px"
-                                : "180px",
-                        padding:
-                          "18px 20px",
                         borderTopLeftRadius:
                           i === 0 ? "24px" : 0,
 
@@ -320,7 +347,7 @@ const DataTable = () => {
                             : "right",
 
                         fontSize:
-                          "11px",
+                          "12px",
 
                         textTransform:
                           "uppercase",
@@ -388,9 +415,6 @@ const DataTable = () => {
 
                     <td
                       style={{
-                        padding:
-                          "18px 20px",
-
                         borderBottom:
                           "1px solid var(--border-color)",
 
@@ -408,9 +432,6 @@ const DataTable = () => {
 
                     <td
                       style={{
-                        padding:
-                          "18px 20px",
-
                         borderBottom:
                           "1px solid var(--border-color)",
 
@@ -428,14 +449,11 @@ const DataTable = () => {
 
                     <td
                       style={{
-                        padding:
-                          "18px 20px",
-
                         borderBottom:
                           "1px solid var(--border-color)",
 
                         color:
-                          "#8b5cf6",
+                          "var(--rmd-color, #8b5cf6)",
 
                         fontWeight: 700,
                         textAlign: "right",
@@ -452,14 +470,11 @@ const DataTable = () => {
 
                     <td
                       style={{
-                        padding:
-                          "18px 20px",
-
                         borderBottom:
                           "1px solid var(--border-color)",
 
                         color:
-                          "#ef4444",
+                          "var(--tax-color, #ef4444)",
 
                         fontWeight: 700,
                         textAlign: "right",
@@ -477,9 +492,6 @@ const DataTable = () => {
 
                     <td
                       style={{
-                        padding:
-                          "18px 20px",
-
                         borderBottom:
                           "1px solid var(--border-color)",
 
@@ -487,7 +499,7 @@ const DataTable = () => {
                           "var(--text-primary)",
 
                         fontWeight: 900,
-                        fontSize: "15px",
+                        fontSize: "max(15px, 1rem)",
                         letterSpacing: "-0.02em",
 
                         fontVariantNumeric:
