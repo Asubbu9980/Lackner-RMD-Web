@@ -16,6 +16,9 @@ import { useMemo } from "react";
 import { getDesignTokens } from "./theme";
 
 import Calculator from "./pages/Calculator";
+import WorkspaceLayout from "./pages/dashboard/WorkspaceLayout";
+import PlannerLayout from "./pages/dashboard/PlannerLayout";
+import ClassicLayout from "./pages/dashboard/ClassicLayout";
 
 import { RenderModeProvider } from "./context/RenderModeContext";
 
@@ -53,11 +56,15 @@ const AppContent = () => {
               element={<LoginPage />}
             />  
 
-            {/* DASHBOARD */}
+            {/* DASHBOARD — shared navbar, two layouts */}
             <Route
               path="/dashboard"
               element={<Calculator />}
-            />
+            >
+              <Route index element={<WorkspaceLayout />} />
+              <Route path="planner" element={<PlannerLayout />} />
+              <Route path="classic" element={<ClassicLayout />} />
+            </Route>
 
           </Routes>
 

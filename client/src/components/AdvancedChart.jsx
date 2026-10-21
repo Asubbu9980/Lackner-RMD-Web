@@ -118,7 +118,7 @@ const AdvancedChart = () => {
   return (
     <Card
       sx={{
-        borderRadius: 4,
+        borderRadius: "var(--card-radius)",
 
         overflow: "hidden",
 

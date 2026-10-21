@@ -27,7 +27,7 @@ const DataTable = () => {
 
         overflow: "hidden",
 
-        borderRadius: "30px",
+        borderRadius: "var(--card-radius)",
 
         background:
           "var(--glass-bg)",

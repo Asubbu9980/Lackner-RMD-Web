@@ -1,4 +1,4 @@
-const API_BASE = "https://lackner-rmd.vercel.app/api";
+export const API_BASE = "https://lackner-rmd.vercel.app/api";
 // const API_BASE = "https://python-backend-rmd.onrender.com";
 
 // Start a cinematic render. Returns { job_id, summary, ... } immediately;

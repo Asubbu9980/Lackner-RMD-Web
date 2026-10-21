@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import useRmd from "../hooks/useRmd";
+import FluidSlider from "./dashboard/FluidSlider";
 
 const scenarios = [
   {
@@ -154,7 +155,7 @@ const InputForm = ({
 
         overflow-hidden
 
-        rounded-[30px]
+        rounded-[var(--card-radius)]
 
         border
         border-[var(--border-color)]
@@ -357,8 +358,9 @@ const InputForm = ({
 
           {/* GROWTH */}
 
-          <div>
+          <div className="md:col-span-2">
             <label
+              htmlFor="classic_growth_Rate"
               className="
                 block
 
@@ -370,30 +372,36 @@ const InputForm = ({
 
                 text-[var(--text-secondary)]
 
-                mb-2
+                mb-1
               "
             >
               Growth Rate (%)
             </label>
 
-            <input
-              name="growth_Rate"
-              value={
-                inputs.growth_Rate
-              }
-              onChange={
-                handleChange
-              }
-              className={
-                inputClass
+            <FluidSlider
+              id="classic_growth_Rate"
+              ariaLabel="growth rate"
+              tone="growth"
+              min={-5}
+              max={15}
+              step={0.5}
+              marks={[4, 6, 8]}
+              value={inputs.growth_Rate}
+              onChange={(v) =>
+                setInputs({
+                  ...inputs,
+
+                  growth_Rate: v,
+                })
               }
             />
           </div>
 
           {/* TAX */}
 
-          <div>
+          <div className="md:col-span-2">
             <label
+              htmlFor="classic_tax_Rate"
               className="
                 block
 
@@ -405,22 +413,27 @@ const InputForm = ({
 
                 text-[var(--text-secondary)]
 
-                mb-2
+                mb-1
               "
             >
               Tax Rate (%)
             </label>
 
-            <input
-              name="tax_Rate"
-              value={
-                inputs.tax_Rate
-              }
-              onChange={
-                handleChange
-              }
-              className={
-                inputClass
+            <FluidSlider
+              id="classic_tax_Rate"
+              ariaLabel="tax rate"
+              tone="tax"
+              min={0}
+              max={50}
+              step={1}
+              marks={[12, 22, 24, 32, 35, 37]}
+              value={inputs.tax_Rate}
+              onChange={(v) =>
+                setInputs({
+                  ...inputs,
+
+                  tax_Rate: v,
+                })
               }
             />
           </div>
@@ -626,48 +639,66 @@ const InputForm = ({
             </h4>
           </div>
 
-          <div className="space-y-3">
-            {scenarios.map(
-              (s) => (
+          {/* compact pills — label is "Chart 01 · Uniform Lifetime" */}
+          <div
+            role="radiogroup"
+            aria-label="Scenario"
+            className="
+              flex
+              flex-wrap
+              gap-2
+            "
+          >
+            {scenarios.map((s) => {
+              const [chart, title] = s.label.split(" · ");
+              const active = inputs.scenario === s.id;
+
+              return (
                 <button
                   key={s.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  title={s.label}
                   onClick={() =>
                     setInputs({
                       ...inputs,
 
-                      scenario:
-                        s.id,
+                      scenario: s.id,
                     })
                   }
                   className={`
-                    relative
+                    inline-flex
+                    items-center
+                    gap-1.5
 
-                    overflow-hidden
-
-                    w-full
-
-                    text-left
-
-                    p-4
-
-                    rounded-2xl
+                    rounded-full
 
                     border
+
+                    py-1.5
+                    pl-1.5
+                    pr-3
+
+                    text-xs
+                    font-semibold
 
                     transition-all
                     duration-300
 
+                    hover:transform-none
+                    active:scale-95
+
                     ${
-                      inputs.scenario ===
-                      s.id
+                      active
                         ? `
-                          border-purple-400/30
+                          border-purple-400/60
 
                           bg-gradient-to-r
-                          from-purple-500/15
-                          to-indigo-500/10
+                          from-purple-500/20
+                          to-indigo-500/15
 
-                          shadow-[0_0_25px_rgba(168,85,247,0.12)]
+                          shadow-[0_0_18px_rgba(168,85,247,0.18)]
 
                           text-[var(--text-primary)]
                         `
@@ -678,41 +709,47 @@ const InputForm = ({
 
                           text-[var(--text-secondary)]
 
-                          hover:border-purple-400/20
-                          hover:bg-[var(--hover-bg)]
+                          hover:border-purple-400/40
+                          hover:text-[var(--text-primary)]
                         `
                     }
                   `}
                 >
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                    "
-                  >
-                    <span
-                      className="
-                        text-sm
-                        font-medium
-                      "
-                    >
-                      {s.label}
-                    </span>
+                  <span
+                    className={`
+                      rounded-full
 
-                    {inputs.scenario ===
-                      s.id && (
-                      <CheckCircle2
-                        size={18}
-                        className="
-                          text-purple-300
-                        "
-                      />
-                    )}
-                  </div>
+                      px-1.5
+                      py-0.5
+
+                      text-[10px]
+                      font-bold
+                      tabular-nums
+
+                      transition-colors
+                      duration-300
+
+                      ${
+                        active
+                          ? "bg-purple-500 text-white"
+                          : "bg-[var(--hover-bg)] text-[var(--text-secondary)]"
+                      }
+                    `}
+                  >
+                    {chart.replace("Chart ", "")}
+                  </span>
+
+                  {title}
+
+                  {active && (
+                    <CheckCircle2
+                      size={14}
+                      className="text-purple-400"
+                    />
+                  )}
                 </button>
-              )
-            )}
+              );
+            })}
           </div>
         </div>
 
@@ -722,7 +759,7 @@ const InputForm = ({
 
         <div
           className="
-            rounded-3xl
+            rounded-[var(--card-radius)]
 
             border
             border-[var(--border-color)]

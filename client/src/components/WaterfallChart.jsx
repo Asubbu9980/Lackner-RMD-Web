@@ -37,7 +37,7 @@ const WaterfallChart = () => {
       sx={{
         width: "100%",
 
-        borderRadius: "22px",
+        borderRadius: "var(--card-radius)",
 
         overflow: "hidden",
 

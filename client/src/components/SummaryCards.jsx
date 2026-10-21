@@ -150,7 +150,7 @@ const SummaryCards = () => {
 
                 overflow-hidden
 
-                rounded-3xl
+                rounded-[var(--card-radius)]
 
                 border
                 ${card.border}
