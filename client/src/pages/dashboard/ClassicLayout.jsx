@@ -293,7 +293,9 @@ const ClassicLayout = () => {
 
                   {/* WATERFALL */}
 
-                  <WaterfallChart />
+                  <ErrorBoundary>
+                    <WaterfallChart />
+                  </ErrorBoundary>
                 </section>
               )}
             </div>

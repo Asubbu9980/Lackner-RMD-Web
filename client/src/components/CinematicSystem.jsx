@@ -143,14 +143,30 @@ export const CinematicLegend = ({ items }) => {
 
 // frameloop: "never" freezes rendering (e.g. while the canvas is off screen)
 export const CinematicCanvas = ({ children, cameraPos = [0, 8, 20], onMouseMove, frameloop = "always", ...props }) => {
+  const [contextLost, setContextLost] = useState(false);
+
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }} onMouseMove={onMouseMove}>
       <Canvas
-        frameloop={frameloop}
-        gl={{ antialias: true, alpha: false, stencil: false, depth: true }}
-        dpr={[1, 2]}
+        frameloop={contextLost ? "never" : frameloop}
+        gl={{
+          antialias: true,
+          alpha: true,
+          stencil: false,
+          depth: true,
+          powerPreference: "high-performance",
+        }}
+        dpr={[1, 1.5]}
         camera={{ position: cameraPos, fov: 45 }}
         style={{ background: "#010409", width: "100%", height: "100%", borderRadius: "20px" }}
+        onContextLost={(e) => {
+          e.preventDefault();
+          setContextLost(true);
+        }}
+        onContextRestored={() => {
+          setContextLost(false);
+        }}
+        {...props}
       >
         <color attach="background" args={["#010409"]} />
         <Environment preset="city" />
@@ -163,11 +179,13 @@ export const CinematicCanvas = ({ children, cameraPos = [0, 8, 20], onMouseMove,
         
         {children}
 
-        <EffectComposer disableNormalPass>
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={400} intensity={2.0} />
-          <Noise opacity={0.04} />
-          <Vignette eskil={false} offset={0.1} darkness={1.2} />
-        </EffectComposer>
+        {!contextLost && (
+          <EffectComposer disableNormalPass multisampling={0}>
+            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={400} intensity={2.0} />
+            <Noise opacity={0.04} />
+            <Vignette eskil={false} offset={0.1} darkness={1.2} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   );
