@@ -7,6 +7,7 @@ import os
 import shutil
 import time
 import asyncio
+import sys
 
 from app.services.voice_service import generate_voice
 from app.services.narration_service import create_narration
@@ -158,19 +159,15 @@ def _run_manim(job_id, scene_config, render_data_path):
     """Run manim and report real animation-render progress."""
 
     command = [
-
+        sys.executable,
+        "-m",
         "manim",
-
         "-qm",
-
         "--fps",
         "15",
-
         "--resolution",
         "854,480",
-
         scene_config["file"],
-
         scene_config["class"]
     ]
 
@@ -178,6 +175,23 @@ def _run_manim(job_id, scene_config, render_data_path):
     # process-global mutation so concurrent renders don't clobber it.
     env = dict(os.environ)
     env["RENDER_DATA_FILE"] = render_data_path
+
+    # Ensure ffmpeg is discovered in PATH for manim
+    if not shutil.which("ffmpeg"):
+        try:
+            import imageio_ffmpeg
+            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+            ffmpeg_dir = os.path.dirname(ffmpeg_exe)
+            binary_name = "ffmpeg.exe" if sys.platform == "win32" else "ffmpeg"
+            target_binary = os.path.join(ffmpeg_dir, binary_name)
+            if not os.path.exists(target_binary) and os.path.exists(ffmpeg_exe):
+                try:
+                    shutil.copyfile(ffmpeg_exe, target_binary)
+                except Exception:
+                    pass
+            env["PATH"] = ffmpeg_dir + os.pathsep + env.get("PATH", "")
+        except Exception:
+            pass
 
     total_animations = _count_expected_animations(scene_config["file"])
 
