@@ -1,55 +1,43 @@
 {
-
   "buildCommand": "npm run build",
-
   "outputDirectory": "dist",
-
   "installCommand": "npm install",
-
   "headers": [
-
     {
-
       "source": "/sw.js",
-
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
       ]
-
     },
-
     {
-
       "source": "/manifest.webmanifest",
-
       "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" },
-        { "key": "Cache-Control", "value": "no-cache" }
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
       ]
-
     }
-
   ],
-
   "rewrites": [
-
     {
-
       "source": "/api/:path*",
-
-      "destination": "http://44.202.179.157:8000/:path*"
-
+      "destination": "http://32.195.43.110:8000/:path*"
     },
-
     {
-
       "source": "/(.*)",
-
       "destination": "/index.html"
-
     }
-
   ]
-
 }
